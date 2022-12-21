@@ -7,7 +7,7 @@
 #define TITLE "Spy Hunter"
 #define CHARSET "cs8x8.bmp"
 
-enum Color {
+enum Color : Uint32 {
 	BLACK = 0x000000,
 	BLUE = 0x0000FF,
 	GREEN = 0x00FF00,
@@ -37,7 +37,18 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
-	int GetRGB(Color color);
+	Uint32 GetRGB(Uint32 color);
+	void DrawText(SDL_Surface* surface, int x, int y, const char* text, SDL_Surface* charset);
+	void DrawText(const char* text, const int x = 0, const int y  = 0);
+	void DrawPixel(SDL_Surface* surface, const int x, const int y, Uint32 color = BLACK);
+	void DrawPixel(const int x = 0, const int y = 0, Uint32 color = BLACK);
+	void DrawLine(SDL_Surface* screen, const int x, const int y, const int length, const int dx, const int dy, Uint32 color = BLACK);
+	void DrawLine(const int x = 0, const int y = 0, const int length = 1, const int dx = 1, const int dy = 1, Uint32 color = BLACK);
+	void DrawRectangle(SDL_Surface* screen, const int x, const int y, const int width, const int height, Uint32 outlineColor, Uint32 fillColor);
+	void DrawRectangle(const int x, const int y, const int width, const int height, Uint32 outlineColor, Uint32 fillColor);
+	void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const int x, const int y);
+	void DrawSurface(SDL_Surface * sprite, const int x = 0, const int y = 0);
+
 	
 	void Initialize(const int width, const int height);
 	void Frame();
