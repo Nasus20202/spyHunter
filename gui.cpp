@@ -4,6 +4,8 @@
 #include<string.h>
 #include "gui.h"
 #include "game.h"
+#include "car.h"
+#include "sprite.h"
 
 Uint32 Gui::GetRGB(Uint32 color) {
 	return SDL_MapRGB(screen->format, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
@@ -104,6 +106,7 @@ void Gui::Initialize(const int width, const int height) {
 		SDL_TEXTUREACCESS_STREAMING,
 		SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_ShowCursor(SDL_DISABLE);
+	
 	charset = SDL_LoadBMP(CHARSET);
 	if (charset == NULL) {
 		printf("SDL_LoadBMP(%s) error: %s\n", CHARSET, SDL_GetError());
@@ -121,8 +124,12 @@ void Gui::Frame() {
 	delta = (t2 - t1) / 1000.0;
 	t1 = t2;
 	worldTime += delta;
-	SDL_FillRect(screen, NULL, GetRGB(BLACK));
-	DrawLine(500, 500, 500, -1, 2, RED);
+	SDL_FillRect(screen, NULL, GetRGB(BACKGROUND));
+
+	DrawRectangle(100, 100, 100, 100, GetRGB(FOREGROUND), GetRGB(FOREGROUND));
+	DrawText("Hello world", 200, 200);
+	
+	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 	SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 	SDL_RenderPresent(renderer);
@@ -139,9 +146,6 @@ void Gui::Frame() {
 void Gui::Input(const SDL_Keycode key) {
 	if (key == SDLK_ESCAPE) {
 		quit = true;
-	}
-	else {
-		DrawText("Logenz", 100, 100);
 	}
 }
 

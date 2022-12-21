@@ -5,7 +5,7 @@
 #define SCREEN_HEIGHT 720
 #define SCREEN_WIDTH 1280
 #define TITLE "Spy Hunter"
-#define CHARSET "cs8x8.bmp"
+#define CHARSET "assets/cs8x8.bmp"
 
 enum Color : Uint32 {
 	BLACK = 0x000000,
@@ -23,7 +23,9 @@ enum Color : Uint32 {
 	LIGHTRED = 0xFFB6C1,
 	LIGHTMAGENTA = 0xFFB6C1,
 	YELLOW = 0xFFFF00,
-	WHITE = 0xFFFFFF
+	WHITE = 0xFFFFFF,
+	BACKGROUND = 0x075d0f,
+	FOREGROUND = 0x222222
 };
 
 class Gui {
