@@ -43,8 +43,8 @@ void Gui::DrawText(const char* text, const int x, const int y) {
 
 void Gui::DrawPixel(SDL_Surface* surface, const int x, const int y, Uint32 color)
 {
-	int bpp = surface->format->BytesPerPixel;
 	if (x < 0 || x >= surface->w || y < 0 || y >= surface->h) return;
+	int bpp = surface->format->BytesPerPixel;
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 	*(Uint32*)p = color;
 }
@@ -92,6 +92,12 @@ void Gui::DrawSurface(SDL_Surface* sprite, const int x, const int y)
 	DrawSurface(screen, sprite, x, y);
 }
 
+void Gui::NewGame()
+{
+	Player* player = new Player(sprites[0], SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.8, 1);
+	game.NewGame(player);
+}
+
 void Gui::Initialize(const int width, const int height) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
@@ -115,14 +121,16 @@ void Gui::Initialize(const int width, const int height) {
 	
 	charset = LoadSurface(CHARSET);
 	LoadSprites();
+	NewGame();
 	// add temp cars
-	for(int i = 0; i <= 6; i++)
-		game.AddCar(new Car(sprites[i], (i+1)*100, 600, (i+1)*15));
+	for(int i = 1; i <= 7; i++)
+		game.AddCar(new Car(sprites[i], (i+1)*100, 600, (i+1)*10));
 	SDL_SetColorKey(charset, true, 0x000000);
 	t1 = SDL_GetTicks();
 	while (!quit) {
 		Update();
 		if (updateTimer >= UPDATE_RATE) {
+			game.Update(updateTimer);
 			Frame();
 			frames++;
 			updateTimer = 0;
@@ -133,7 +141,7 @@ void Gui::Initialize(const int width, const int height) {
 void Gui::LoadSprites() {
 	// files to be loaded as sprites
 	const char* names[] = {  "assets/player.bmp", "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp",
-							 "assets/whitecar.bmp" , "assets/yellowcar.bmp" };
+							 "assets/whitecar.bmp" , "assets/yellowcar.bmp", "assets/pinkcar.bmp"};
 	for (const char* name : names) {
 		LoadSprite(name);
 	}
@@ -169,6 +177,7 @@ void Gui::Frame() {
 		Car* car = game.GetCar(i);
 		DrawSurface(car->GetSurface(), car->GetX(), car->GetY());
 	}
+	DrawSurface(game.GetPlayer()->GetSurface(), game.GetPlayer()->GetX(), game.GetPlayer()->GetY());
 	
 	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -177,20 +186,37 @@ void Gui::Frame() {
 
 	// handle events
 	while (SDL_PollEvent(&event) != 0) {
-		if (event.type == SDL_QUIT) {
-			quit = true;
-		}
 		if (event.type == SDL_KEYDOWN) {
 			Input(event.key.keysym.sym);
 		}
+		else if (event.type == SDL_QUIT) {
+			quit = true;
+		}
 	}
+	GameInput();
 }
 
 // user keyboard input
 void Gui::Input(const SDL_Keycode key) {
-	if (key == SDLK_ESCAPE) {
-		quit = true;
+	switch (key) {
+	case SDLK_ESCAPE:
+		quit = true; break;
+	case SDLK_n:
+		NewGame(); break;
 	}
+}
+
+
+void Gui::GameInput()
+{
+	if (currentKeyStates[SDL_SCANCODE_LEFT] || currentKeyStates[SDL_SCANCODE_A])
+		game.GetPlayer()->Left();
+	if (currentKeyStates[SDL_SCANCODE_RIGHT] || currentKeyStates[SDL_SCANCODE_D])
+		game.GetPlayer()->Right();
+	if (currentKeyStates[SDL_SCANCODE_UP] || currentKeyStates[SDL_SCANCODE_W])
+		game.GetPlayer()->Accelerate();
+	if (currentKeyStates[SDL_SCANCODE_DOWN] || currentKeyStates[SDL_SCANCODE_S])
+		game.GetPlayer()->Brake();
 }
 
 // update game state
@@ -206,11 +232,6 @@ void Gui::Update() {
 		frames = 0;
 		fpsTimer -= 0.5;
 	}
-	if (updateTimer >= UPDATE_RATE) {
-		for (int i = 0; i < game.GetCarsAmount(); i++) {
-			game.GetCar(i)->Update(updateTimer);
-		}
-	}
 }
 
 void Gui::Exit() {
@@ -224,8 +245,10 @@ void Gui::Exit() {
 	SDL_Quit();
 	delete[] sprites;
 }
+
 	
 Gui::Gui(const int width, const int height) {
+	currentKeyStates = SDL_GetKeyboardState(NULL);
 	game = Game::Game();
 	Initialize(width, height);
 }

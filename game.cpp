@@ -3,6 +3,7 @@
 Game::Game()
 {
 	cars = NULL;
+	player = NULL;
 }
 
 Game::~Game()
@@ -21,6 +22,32 @@ void Game::AddCar(Car *car)
 	cars = temp;
 }
 
+void Game::RemoveCar(const int index)
+{
+	Car** temp = new Car * [carsAmount - 1];
+	for (int i = 0; i < index; i++)
+		temp[i] = cars[i];
+	for (int i = index; i < carsAmount - 1; i++)
+		temp[i] = cars[i + 1];
+	carsAmount--;
+	delete[] cars;
+	cars = temp;
+}
+
+void Game::NewGame(Player* player)
+{
+	delete[] cars;
+	cars = NULL;
+	carsAmount = 0;
+	delete this->player;
+	this->player = player;
+}
+
+Player* Game::GetPlayer()
+{
+	return player;
+}
+
 Car* Game::GetCar(const int index)
 {
 	if (index < 0 || index >= carsAmount)
@@ -36,4 +63,12 @@ Car** Game::GetCars()
 int Game::GetCarsAmount()
 {
 	return carsAmount;
+}
+
+void Game::Update(const double delta)
+{
+	GetPlayer()->Update();
+	for (int i = 0; i < GetCarsAmount(); i++) {
+		GetCar(i)->Update(delta);
+	}
 }

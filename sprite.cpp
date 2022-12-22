@@ -16,7 +16,6 @@ Sprite::Sprite()
 
 Sprite::~Sprite()
 {
-	delete sprite;
 }
 
 SDL_Surface* Sprite::GetSurface()

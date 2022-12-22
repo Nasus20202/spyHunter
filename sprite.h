@@ -3,7 +3,7 @@
 #include"./SDL2-2.0.10/include/SDL_main.h"
 
 class Sprite {
-private:
+protected:
 	SDL_Surface* sprite;
 	double x, y;
 public:

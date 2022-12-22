@@ -8,7 +8,6 @@
 #define TITLE "Spy Hunter"
 #define CHARSET "assets/cs16x16.bmp"
 #define FONT_SIZE 16
-#define CAR_WIDTH 48
 #define FPS_CAP 250
 #define UPDATE_RATE (1/((double)FPS_CAP))
 
@@ -45,6 +44,7 @@ private:
 	SDL_Texture* scrtex;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	const Uint8* currentKeyStates;
 
 	Uint32 GetRGB(Uint32 color);
 	SDL_Surface* LoadSurface(const char* name);
@@ -59,6 +59,7 @@ private:
 	void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const int x, const int y);
 	void DrawSurface(SDL_Surface * sprite, const int x = 0, const int y = 0);
 
+	void NewGame();
 	
 	void Initialize(const int width, const int height);
 	void LoadSprites();
@@ -66,6 +67,7 @@ private:
 	void Update();
 	void Frame();
 	void Input(const SDL_Keycode code);
+	void GameInput();
 	void Exit();
 public:
 	Gui(const int width = SCREEN_WIDTH, const int height = SCREEN_HEIGHT);
