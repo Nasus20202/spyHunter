@@ -4,9 +4,6 @@
 #include "sprite.h"
 #include "car.h"
 
-#define CAR_WIDTH 48
-#define CAR_HEIGHT 100
-
 class Game {
 private:
 	Car* *cars;

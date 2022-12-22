@@ -20,25 +20,25 @@ SDL_Surface* Gui::LoadSurface(const char* name) {
 	return surface;
 }
 
-void Gui::DrawText(SDL_Surface* screen, int x, int y, const char* text, SDL_Surface* charset) {
+void Gui::DrawText(SDL_Surface* screen, int x, int y, const char* text, SDL_Surface* charset, int fontSize) {
 	int px, py, c;
 	SDL_Rect s, d;
-	s.w = s.h = d.w = d.h = FONT_SIZE;
+	s.w = s.h = d.w = d.h = fontSize;
 	while (*text) {
 		c = *text & 255;
-		px = (c % 16) * FONT_SIZE;
-		py = (c / 16) * FONT_SIZE;
+		px = (c % 16) * fontSize;
+		py = (c / 16) * fontSize;
 		s.x = px;
 		s.y = py;
 		d.x = x;
 		d.y = y;
 		SDL_BlitSurface(charset, &s, screen, &d);
-		x += FONT_SIZE;
+		x += fontSize;
 		text++;
 	};
 };
-void Gui::DrawText(const char* text, const int x, const int y) {
-	DrawText(screen, x, y, text, charset);
+void Gui::DrawText(const char* text, const int x, const int y, bool big) {
+	DrawText(screen, x, y, text, big ? charsetBig : charsetSmall, big ? FONT_SIZE_BIG : FONT_SIZE_SMALL);
 }
 
 void Gui::DrawPixel(SDL_Surface* surface, const int x, const int y, Uint32 color)
@@ -94,8 +94,12 @@ void Gui::DrawSurface(SDL_Surface* sprite, const int x, const int y)
 
 void Gui::NewGame()
 {
-	Player* player = new Player(sprites[0], SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.8, 1);
+	Player* player = new Player(sprites[0], SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.8);
 	game.NewGame(player);
+	// add temp cars
+	for (int i = 1; i <= 7; i++)
+		game.AddCar(new Car(sprites[i], (i + 1) * 100, 600, (i + 1) * 100));
+	worldTime = 0;
 }
 
 void Gui::Initialize(const int width, const int height) {
@@ -118,14 +122,13 @@ void Gui::Initialize(const int width, const int height) {
 		SDL_TEXTUREACCESS_STREAMING,
 		SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_ShowCursor(SDL_DISABLE);
+	currentKeyStates = SDL_GetKeyboardState(NULL);
 	
-	charset = LoadSurface(CHARSET);
+	charsetBig = LoadSurface(CHARSET_BIG);
+	charsetSmall = LoadSurface(CHARSET_SMALL);
 	LoadSprites();
 	NewGame();
-	// add temp cars
-	for(int i = 1; i <= 7; i++)
-		game.AddCar(new Car(sprites[i], (i+1)*100, 600, (i+1)*10));
-	SDL_SetColorKey(charset, true, 0x000000);
+	SDL_SetColorKey(charsetBig, true, 0x000000); SDL_SetColorKey(charsetSmall, true, 0x000000);
 	t1 = SDL_GetTicks();
 	while (!quit) {
 		Update();
@@ -169,15 +172,23 @@ void Gui::Frame() {
 	DrawRectangle(100, 100, 100, 100, GetRGB(FOREGROUND), GetRGB(FOREGROUND));
 	DrawText("Hello world", 200, 200);
 
-	char fpsString[32];
-	sprintf_s(fpsString, "FPS: %.0lf", fps);
-	DrawText(fpsString, 10, 10);
-
+	// draw cars
 	for (int i = 0; i < game.GetCarsAmount(); i++) {
 		Car* car = game.GetCar(i);
 		DrawSurface(car->GetSurface(), car->GetX(), car->GetY());
 	}
-	DrawSurface(game.GetPlayer()->GetSurface(), game.GetPlayer()->GetX(), game.GetPlayer()->GetY());
+	// draw player
+	Player* player = game.GetPlayer();
+	DrawSurface(player->GetSurface(), player->GetX(), player->GetY());
+
+	// print game info
+	char info[32];
+	sprintf_s(info, "FPS: %.0lf", fps);
+	DrawText(info, 5, 5, false);
+	sprintf_s(info, "Time: %.1lfs", worldTime);
+	DrawText(info, 5, 17, false);
+	sprintf_s(info, "Speed: %.0lf", game.GetPlayer()->GetSpeed());
+	DrawText(info, 5, 29, false);
 	
 	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -206,7 +217,7 @@ void Gui::Input(const SDL_Keycode key) {
 	}
 }
 
-
+// fast input for steering
 void Gui::GameInput()
 {
 	if (currentKeyStates[SDL_SCANCODE_LEFT] || currentKeyStates[SDL_SCANCODE_A])
@@ -217,6 +228,8 @@ void Gui::GameInput()
 		game.GetPlayer()->Accelerate();
 	if (currentKeyStates[SDL_SCANCODE_DOWN] || currentKeyStates[SDL_SCANCODE_S])
 		game.GetPlayer()->Brake();
+	if (currentKeyStates[SDL_SCANCODE_SPACE])
+		game.GetPlayer()->Shoot();
 }
 
 // update game state
@@ -234,8 +247,9 @@ void Gui::Update() {
 	}
 }
 
+// clear memory
 void Gui::Exit() {
-	SDL_FreeSurface(charset);
+	SDL_FreeSurface(charsetBig); SDL_FreeSurface(charsetSmall);
 	SDL_FreeSurface(screen);
 	for (int i = 0; i < spritesCount; i++)
 		SDL_FreeSurface(sprites[i]);
@@ -248,7 +262,6 @@ void Gui::Exit() {
 
 	
 Gui::Gui(const int width, const int height) {
-	currentKeyStates = SDL_GetKeyboardState(NULL);
 	game = Game::Game();
 	Initialize(width, height);
 }

@@ -1,4 +1,5 @@
 #include "car.h"
+#include <cmath>
 
 #pragma region Car
 
@@ -24,9 +25,9 @@
 		return this->speed;
 	}
 
-	void Car::Update(const double delta)
+	void Car::Update(const double delta, const double playerSpeed)
 	{
-		this->MoveY(this->GetSpeed() * -delta);
+		this->MoveY((this->GetSpeed() - playerSpeed) * -delta);
 	}
 
 #pragma endregion
@@ -44,33 +45,50 @@
 
 	void Player::Accelerate()
 	{
-		this->speed += 0.1;
+		if ((this->GetSpeed() + speedBuffer) < MAX_SPEED)
+			this->speedBuffer += ACCELERATION;
 	}
 
 	void Player::Brake()
 	{
-		this->speed -= 0.1;
+		if ((this->GetSpeed() + speedBuffer) > 0)
+			this->speedBuffer -= ACCELERATION;
 	}
 
 	void Player::Right()
 	{
-		this->moveBuffer+=1;
+		this->moveBuffer += SteeringSpeed();
 	}
 
 	void Player::Left()
 	{
-		this->moveBuffer-=1;
+		this->moveBuffer-= SteeringSpeed();
+	}
+
+#include <cstdio>
+	double Player::SteeringSpeed()
+	{
+		double speed = this->GetSpeed();
+		return pow(speed, 0.5) * 0.1;
 	}
 
 	void Player::Update()
 	{
 		if (this->moveBuffer > 0) {
-			this->moveBuffer--;
-			this->MoveX(1);
+			this->moveBuffer-= SteeringSpeed();
+			this->MoveX(SteeringSpeed());
 		}
 		else if (this->moveBuffer < 0) {
-			this->moveBuffer++;
-			this->MoveX(-1);
+			this->moveBuffer+= SteeringSpeed();
+			this->MoveX(-SteeringSpeed());
+		}
+		if (this->speedBuffer > 0) {
+			this->speedBuffer-= ACCELERATION;
+			this->SetSpeed(this->GetSpeed() + ACCELERATION);
+		}
+		else if (this->speedBuffer < 0) {
+			this->speedBuffer+= ACCELERATION;
+			this->SetSpeed(this->GetSpeed() - ACCELERATION);
 		}
 	}
 

@@ -67,8 +67,10 @@ int Game::GetCarsAmount()
 
 void Game::Update(const double delta)
 {
-	GetPlayer()->Update();
+	Player* player = this->GetPlayer();
+	player->Update();
+	const double playerSpeed = player->GetSpeed();
 	for (int i = 0; i < GetCarsAmount(); i++) {
-		GetCar(i)->Update(delta);
+		GetCar(i)->Update(delta, playerSpeed);
 	}
 }

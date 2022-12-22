@@ -6,8 +6,10 @@
 #define SCREEN_HEIGHT 720
 #define SCREEN_WIDTH 1280
 #define TITLE "Spy Hunter"
-#define CHARSET "assets/cs16x16.bmp"
-#define FONT_SIZE 16
+#define CHARSET_BIG "assets/cs16x16.bmp"
+#define CHARSET_SMALL "assets/cs8x8.bmp"
+#define FONT_SIZE_BIG 16
+#define FONT_SIZE_SMALL 8
 #define FPS_CAP 250
 #define UPDATE_RATE (1/((double)FPS_CAP))
 
@@ -39,7 +41,7 @@ private:
 	int t1, t2, frames = 0, spritesCount = 0;
 	double delta, worldTime = 0, fpsTimer = 0, updateTimer = 0, fps;
 	SDL_Event event;
-	SDL_Surface* screen, * charset;
+	SDL_Surface* screen, *charsetBig, *charsetSmall;
 	SDL_Surface* *sprites;
 	SDL_Texture* scrtex;
 	SDL_Window* window;
@@ -48,8 +50,8 @@ private:
 
 	Uint32 GetRGB(Uint32 color);
 	SDL_Surface* LoadSurface(const char* name);
-	void DrawText(SDL_Surface* surface, int x, int y, const char* text, SDL_Surface* charset);
-	void DrawText(const char* text, const int x = 0, const int y  = 0);
+	void DrawText(SDL_Surface* surface, int x, int y, const char* text, SDL_Surface* charset, int fontSize);
+	void DrawText(const char* text, const int x = 0, const int y = 0, bool big = true);
 	void DrawPixel(SDL_Surface* surface, const int x, const int y, Uint32 color = BLACK);
 	void DrawPixel(const int x = 0, const int y = 0, Uint32 color = BLACK);
 	void DrawLine(SDL_Surface* screen, const int x, const int y, const int length, const int dx, const int dy, Uint32 color = BLACK);
