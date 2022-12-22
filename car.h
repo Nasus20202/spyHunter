@@ -4,12 +4,21 @@
 #include "sprite.h"
 
 class Car : public Sprite {
-private:
+protected:
 	double speed;
 public:
 	Car(SDL_Surface* sprite, int x, int y, double speed);
+	Car();
 	~Car();
 	void SetSpeed(double speed);
 	double GetSpeed();
 	void Update();
+};
+
+class Player : public Car {
+private:
+public:
+	void Shoot();
+	void Accelerate();
+	void Brake();
 };

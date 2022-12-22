@@ -8,6 +8,7 @@ private:
 	int x, y;
 public:
 	Sprite(SDL_Surface* sprite, int x, int y);
+	Sprite();
 	~Sprite();
 	SDL_Surface* GetSurface();
 	void SetSurface(SDL_Surface* sprite);

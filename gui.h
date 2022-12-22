@@ -1,11 +1,14 @@
 #pragma once
 #include"./SDL2-2.0.10/include/SDL.h"
 #include"./SDL2-2.0.10/include/SDL_main.h"
+#include "game.h"
 
 #define SCREEN_HEIGHT 720
 #define SCREEN_WIDTH 1280
 #define TITLE "Spy Hunter"
-#define CHARSET "assets/cs8x8.bmp"
+#define CHARSET "assets/cs16x16.bmp"
+#define FONT_SIZE 16
+#define CAR_WIDTH 48
 
 enum Color : Uint32 {
 	BLACK = 0x000000,
@@ -30,16 +33,19 @@ enum Color : Uint32 {
 
 class Gui {
 private:
+	Game game;
 	bool quit = false;
-	int t1, t2, frames = 0;
+	int t1, t2, frames = 0, spritesCount = 0;
 	double delta, worldTime = 0, fpsTimer, fps;
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
+	SDL_Surface* *sprites;
 	SDL_Texture* scrtex;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
 	Uint32 GetRGB(Uint32 color);
+	SDL_Surface* LoadSurface(const char* name);
 	void DrawText(SDL_Surface* surface, int x, int y, const char* text, SDL_Surface* charset);
 	void DrawText(const char* text, const int x = 0, const int y  = 0);
 	void DrawPixel(SDL_Surface* surface, const int x, const int y, Uint32 color = BLACK);
@@ -53,6 +59,9 @@ private:
 
 	
 	void Initialize(const int width, const int height);
+	void LoadSprites();
+	void LoadSprite(const char* path);
+	void Update();
 	void Frame();
 	void Input(const SDL_Keycode code);
 	void Exit();

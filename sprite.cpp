@@ -7,6 +7,13 @@ Sprite::Sprite(SDL_Surface* sprite, int x, int y)
 	this->SetY(y);
 }
 
+Sprite::Sprite()
+{
+	this->SetSurface(NULL);
+	this->SetX(0);
+	this->SetY(0);
+}
+
 Sprite::~Sprite()
 {
 	delete sprite;
