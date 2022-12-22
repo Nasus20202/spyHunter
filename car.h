@@ -19,7 +19,7 @@ public:
 
 class Player : public Car {
 private:
-	int moveBuffer = 0, speedBuffer = 0;
+	double moveBuffer = 0, speedBuffer = 0;
 public:
 	Player(SDL_Surface* sprite, const int x, const int y, const double speed = 50 * ACCELERATION);
 	void Shoot();

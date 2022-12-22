@@ -65,7 +65,6 @@
 		this->moveBuffer-= SteeringSpeed();
 	}
 
-#include <cstdio>
 	double Player::SteeringSpeed()
 	{
 		double speed = this->GetSpeed();

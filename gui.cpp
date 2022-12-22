@@ -98,7 +98,7 @@ void Gui::NewGame()
 	game.NewGame(player);
 	// add temp cars
 	for (int i = 1; i <= 7; i++)
-		game.AddCar(new Car(sprites[i], (i + 1) * 100, 600, (i + 1) * 100));
+		game.AddCar(new Car(sprites[i], (i + 1) * 100, 600, (i + 1) * 50));
 	worldTime = 0;
 }
 
@@ -182,7 +182,7 @@ void Gui::Frame() {
 	DrawSurface(player->GetSurface(), player->GetX(), player->GetY());
 
 	// print game info
-	char info[32];
+	char info[128];
 	sprintf_s(info, "FPS: %.0lf", fps);
 	DrawText(info, 5, 5, false);
 	sprintf_s(info, "Time: %.1lfs", worldTime);
