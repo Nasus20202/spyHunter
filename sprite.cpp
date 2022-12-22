@@ -1,6 +1,6 @@
 #include "sprite.h"
 
-Sprite::Sprite(SDL_Surface* sprite, int x, int y)
+Sprite::Sprite(SDL_Surface* sprite, const double x, const double y)
 {
 	this->SetSurface(sprite);
 	this->SetX(x);
@@ -29,41 +29,41 @@ void Sprite::SetSurface(SDL_Surface* sprite)
 	this->sprite = sprite;
 }
 
-void Sprite::Move(int x, int y)
+void Sprite::Move(const double x, const double y)
 {
 	this->MoveX(x); this->MoveY(y);
 }
 
-void Sprite::MoveX(int x)
+void Sprite::MoveX(const double x)
 {
 	this->x += x;
 }
 
-void Sprite::MoveY(int y)
+void Sprite::MoveY(const double y)
 {
 	this->y += y;
 }
 
-void Sprite::SetX(int x)
+void Sprite::SetX(const double x)
 {
 	this->x = x;
 }
 
-void Sprite::SetY(int y)
+void Sprite::SetY(const double y)
 {
 	this->y = y;
 }
 
-void Sprite::Update()
+void Sprite::Update(const double delta)
 {
 }
 
 int Sprite::GetX()
 {
-	return x;
+	return (int)x;
 }
 
 int Sprite::GetY()
 {
-	return y;
+	return (int)y;
 }

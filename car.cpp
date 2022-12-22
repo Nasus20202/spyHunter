@@ -22,9 +22,9 @@ double Car::GetSpeed()
 	return this->speed;
 }
 
-void Car::Update()
+void Car::Update(const double delta)
 {
-	this->MoveX(this->speed);
+	this->MoveY(this->GetSpeed() * -delta);
 }
 
 void Player::Shoot()

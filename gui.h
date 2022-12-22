@@ -9,6 +9,8 @@
 #define CHARSET "assets/cs16x16.bmp"
 #define FONT_SIZE 16
 #define CAR_WIDTH 48
+#define FPS_CAP 250
+#define UPDATE_RATE (1/((double)FPS_CAP))
 
 enum Color : Uint32 {
 	BLACK = 0x000000,
@@ -36,7 +38,7 @@ private:
 	Game game;
 	bool quit = false;
 	int t1, t2, frames = 0, spritesCount = 0;
-	double delta, worldTime = 0, fpsTimer, fps;
+	double delta, worldTime = 0, fpsTimer = 0, updateTimer = 0, fps;
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
 	SDL_Surface* *sprites;

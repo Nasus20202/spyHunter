@@ -5,19 +5,19 @@
 class Sprite {
 private:
 	SDL_Surface* sprite;
-	int x, y;
+	double x, y;
 public:
-	Sprite(SDL_Surface* sprite, int x, int y);
+	Sprite(SDL_Surface* sprite, const double x, const double y);
 	Sprite();
 	~Sprite();
 	SDL_Surface* GetSurface();
 	void SetSurface(SDL_Surface* sprite);
-	void Move(int x, int y);
-	void MoveX(int x);
-	void MoveY(int y);
-	void SetX(int x);
-	void SetY(int y);
-	void Update();
+	void Move(const double x, const double y);
+	void MoveX(const double x);
+	void MoveY(const double y);
+	void SetX(const double x);
+	void SetY(const double y);
+	void Update(const double delta);
 	int GetX();
 	int GetY();
 };

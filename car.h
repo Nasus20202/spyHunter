@@ -12,7 +12,7 @@ public:
 	~Car();
 	void SetSpeed(double speed);
 	double GetSpeed();
-	void Update();
+	void Update(const double delta);
 };
 
 class Player : public Car {

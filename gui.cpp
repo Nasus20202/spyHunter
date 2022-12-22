@@ -115,14 +115,18 @@ void Gui::Initialize(const int width, const int height) {
 	
 	charset = LoadSurface(CHARSET);
 	LoadSprites();
+	// add temp cars
 	for(int i = 0; i <= 6; i++)
-		game.AddCar(new Car(sprites[i], (i+1)*100, 600, 1));
+		game.AddCar(new Car(sprites[i], (i+1)*100, 600, (i+1)*15));
 	SDL_SetColorKey(charset, true, 0x000000);
 	t1 = SDL_GetTicks();
 	while (!quit) {
 		Update();
-		Frame();
-		frames++;
+		if (updateTimer >= UPDATE_RATE) {
+			Frame();
+			frames++;
+			updateTimer = 0;
+		}
 	}
 }
 
@@ -196,11 +200,17 @@ void Gui::Update() {
 	t1 = t2;
 	worldTime += delta;
 	fpsTimer += delta;
-	if (fpsTimer > 0.5) {
+	updateTimer += delta;
+	if (fpsTimer >= 0.5) {
 		fps = frames * 2;
 		frames = 0;
 		fpsTimer -= 0.5;
-	};
+	}
+	if (updateTimer >= UPDATE_RATE) {
+		for (int i = 0; i < game.GetCarsAmount(); i++) {
+			game.GetCar(i)->Update(updateTimer);
+		}
+	}
 }
 
 void Gui::Exit() {
@@ -212,6 +222,7 @@ void Gui::Exit() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+	delete[] sprites;
 }
 	
 Gui::Gui(const int width, const int height) {

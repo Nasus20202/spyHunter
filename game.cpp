@@ -7,7 +7,7 @@ Game::Game()
 
 Game::~Game()
 {
-	delete cars;
+	delete[] cars;
 }
 
 void Game::AddCar(Car *car)
