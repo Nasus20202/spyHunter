@@ -133,12 +133,6 @@ void Gui::Initialize(const int width, const int height) {
 	t1 = SDL_GetTicks();
 	while (!quit) {
 		Update();
-		if (updateTimer >= UPDATE_RATE) {
-			game.Update(updateTimer);
-			Frame();
-			frames++;
-			updateTimer = 0;
-		}
 	}
 }
 
@@ -194,17 +188,6 @@ void Gui::Frame() {
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 	SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 	SDL_RenderPresent(renderer);
-
-	// handle events
-	while (SDL_PollEvent(&event) != 0) {
-		if (event.type == SDL_KEYDOWN) {
-			Input(event.key.keysym.sym);
-		}
-		else if (event.type == SDL_QUIT) {
-			quit = true;
-		}
-	}
-	GameInput();
 }
 
 // user keyboard input
@@ -240,10 +223,34 @@ void Gui::Update() {
 	worldTime += delta;
 	fpsTimer += delta;
 	updateTimer += delta;
+	frameTimer += delta;
+	// count fps
 	if (fpsTimer >= 0.5) {
 		fps = frames * 2;
 		frames = 0;
 		fpsTimer -= 0.5;
+	}
+	// update screen
+	if (frameTimer >= FRAME_TIME) {
+		Frame();
+		frames++;
+		frameTimer = 0;
+	}
+	// update game state
+	if (updateTimer >= UPDATE_TIME) {
+		// handle events
+		while (SDL_PollEvent(&event) != 0) {
+			if (event.type == SDL_KEYDOWN) {
+				Input(event.key.keysym.sym); // key down event
+			}
+			else if (event.type == SDL_QUIT) {
+				quit = true;
+			}
+		}
+		// handle pressed keys
+		GameInput();
+		game.Update(updateTimer); // update game state
+		updateTimer = 0;
 	}
 }
 

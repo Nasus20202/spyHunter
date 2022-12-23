@@ -16,6 +16,12 @@
 				"assets/whitecar.bmp", "assets/yellowcar.bmp", "assets/pinkcar.bmp"
 #define FPS_CAP 250
 #define UPDATE_RATE (1/((double)FPS_CAP))
+// frames per second cap
+#define FPS_CAP 1000
+#define FRAME_TIME (1/((double)FPS_CAP))
+// game state refresh rate
+#define UPDATE_RATE 250
+#define UPDATE_TIME (1/((double)UPDATE_RATE))
 
 enum Color : Uint32 {
 	BLACK = 0x000000,
@@ -43,7 +49,7 @@ private:
 	Game game;
 	bool quit = false;
 	int t1, t2, frames = 0, spritesCount = 0;
-	double delta, worldTime = 0, fpsTimer = 0, updateTimer = 0, fps;
+	double delta, worldTime = 0, fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps;
 	SDL_Event event;
 	SDL_Surface* screen, *charsetBig, *charsetSmall;
 	SDL_Surface* *sprites;
