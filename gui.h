@@ -50,10 +50,10 @@ public:
 
 class Gui {
 private:
-	Game game;
+	Game* game;
 	bool quit = false;
 	int t1, t2, frames = 0, spritesCount = 0;
-	double delta, worldTime = 0, fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps;
+	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps;
 	SDL_Event event;
 	SDL_Surface* screen, *charsetBig, *charsetSmall;
 	SDL_Surface* *sprites;

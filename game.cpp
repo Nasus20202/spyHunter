@@ -1,14 +1,25 @@
 #include "game.h"
 
-Game::Game()
+enum road : char {
+	road = 'r',
+	grass = 'g',
+	stripes = 's',
+};
+
+Game::Game(const int mapHeight, const int mapWidth)
 {
 	cars = NULL;
 	player = NULL;
+	this->mapHeight = mapHeight;
+	this->mapWidth = mapWidth;
+	NewMap();
 }
 
 Game::~Game()
 {
 	delete[] cars;
+	delete player;
+	delete[] map;
 }
 
 void Game::AddCar(Car *car)
@@ -41,6 +52,7 @@ void Game::NewGame(Player* player)
 	carsAmount = 0;
 	delete this->player;
 	this->player = player;
+	worldTime = 0;
 }
 
 Player* Game::GetPlayer()
@@ -65,8 +77,14 @@ int Game::GetCarsAmount()
 	return carsAmount;
 }
 
+double Game::GetTime()
+{
+	return worldTime;
+}
+
 void Game::Update(const double delta)
 {
+	worldTime += delta;
 	Player* player = this->GetPlayer();
 	player->Update();
 	const double playerSpeed = player->GetSpeed();
@@ -74,3 +92,27 @@ void Game::Update(const double delta)
 		GetCar(i)->Update(delta, playerSpeed);
 	}
 }
+
+void Game::NewMap()
+{
+	this->map = new char[mapHeight * mapWidth];
+	for (int i = 0; i < mapHeight * mapWidth; i++)
+		this->map[i] = grass;
+}
+
+char Game::GetMap(const int x, const int y)
+{
+	return map[y * mapWidth + x];
+}
+
+char* Game::GetMap()
+{
+	return map;
+}
+
+void Game::SetMap(const int x, const int y, const char value)
+{
+	map[y * mapWidth + x] = value;
+}
+
+

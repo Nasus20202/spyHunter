@@ -95,11 +95,10 @@ void Gui::DrawSurface(SDL_Surface* sprite, const Point point)
 void Gui::NewGame()
 {
 	Player* player = new Player(sprites[0], (int) (SCREEN_WIDTH / 2), (int) (SCREEN_HEIGHT * 0.8));
-	game.NewGame(player);
+	game->NewGame(player);
 	// add temp cars
 	for (int i = 1; i <= 7; i++)
-		game.AddCar(new Car(sprites[i], (i + 1) * 100, 600, (i + 1) * 50));
-	worldTime = 0;
+		game->AddCar(new Car(sprites[i], (i + 1) * 100, 600, (i + 1) * 50));
 }
 
 // create and customize GUI
@@ -167,21 +166,21 @@ void Gui::Frame() {
 	DrawText("Hello world", { 200, 200 });
 
 	// draw cars
-	for (int i = 0; i < game.GetCarsAmount(); i++) {
-		Car* car = game.GetCar(i);
+	for (int i = 0; i < game->GetCarsAmount(); i++) {
+		Car* car = game->GetCar(i);
 		DrawSurface(car->GetSurface(), { car->GetX(), car->GetY() });
 	}
 	// draw player
-	Player* player = game.GetPlayer();
+	Player* player = game->GetPlayer();
 	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
 	// print game info
 	char info[128];
 	sprintf_s(info, "FPS: %.0lf", fps);
 	DrawText(info, Point(5, 5), false);
-	sprintf_s(info, "Time: %.1lfs", worldTime);
+	sprintf_s(info, "Time: %.1lfs", game->GetTime());
 	DrawText(info, Point(5, 17) , false);
-	sprintf_s(info, "Speed: %.0lf", game.GetPlayer()->GetSpeed());
+	sprintf_s(info, "Speed: %.0lf", game->GetPlayer()->GetSpeed());
 	DrawText(info, Point(5, 29), false);
 	
 	// render
@@ -204,23 +203,22 @@ void Gui::Input(const SDL_Keycode key) {
 void Gui::GameInput()
 {
 	if (currentKeyStates[SDL_SCANCODE_LEFT] || currentKeyStates[SDL_SCANCODE_A])
-		game.GetPlayer()->Left();
+		game->GetPlayer()->Left();
 	if (currentKeyStates[SDL_SCANCODE_RIGHT] || currentKeyStates[SDL_SCANCODE_D])
-		game.GetPlayer()->Right();
+		game->GetPlayer()->Right();
 	if (currentKeyStates[SDL_SCANCODE_UP] || currentKeyStates[SDL_SCANCODE_W])
-		game.GetPlayer()->Accelerate();
+		game->GetPlayer()->Accelerate();
 	if (currentKeyStates[SDL_SCANCODE_DOWN] || currentKeyStates[SDL_SCANCODE_S])
-		game.GetPlayer()->Brake();
+		game->GetPlayer()->Brake();
 	if (currentKeyStates[SDL_SCANCODE_SPACE])
-		game.GetPlayer()->Shoot();
+		game->GetPlayer()->Shoot();
 }
 
 // update game state
 void Gui::Update() {
 	t2 = SDL_GetTicks();
-	delta = (t2 - t1) / 1000.0;
+	double delta = (t2 - t1) / 1000.0;
 	t1 = t2;
-	worldTime += delta;
 	fpsTimer += delta;
 	updateTimer += delta;
 	frameTimer += delta;
@@ -249,7 +247,7 @@ void Gui::Update() {
 		}
 		// handle pressed keys
 		GameInput();
-		game.Update(updateTimer); // update game state
+		game->Update(updateTimer); // update game state
 		updateTimer = 0;
 	}
 }
@@ -269,7 +267,7 @@ void Gui::Exit() {
 
 	
 Gui::Gui(const int width, const int height) {
-	game = Game::Game();
+	game = new Game(width, height);
 	Initialize(width, height);
 }
 
