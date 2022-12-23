@@ -10,8 +10,10 @@
 #define CHARSET_SMALL "assets/cs8x8.bmp"
 #define FONT_SIZE_BIG 16
 #define FONT_SIZE_SMALL 8
+// frames per second cap
 #define FPS_CAP 1000
 #define FRAME_TIME (1/((double)FPS_CAP))
+// game state refresh rate
 #define UPDATE_RATE 250
 #define UPDATE_TIME (1/((double)UPDATE_RATE))
 
