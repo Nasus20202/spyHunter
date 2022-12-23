@@ -1,17 +1,11 @@
 #include "game.h"
 
-enum road : char {
-	road = 'r',
-	grass = 'g',
-	stripes = 's',
-};
-
-Game::Game(const int mapHeight, const int mapWidth)
+Game::Game(const int mapWidth, const int mapHeight)
 {
 	cars = NULL;
 	player = NULL;
-	this->mapHeight = mapHeight;
 	this->mapWidth = mapWidth;
+	this->mapHeight = mapHeight;
 	NewMap();
 }
 
@@ -53,6 +47,7 @@ void Game::NewGame(Player* player)
 	delete this->player;
 	this->player = player;
 	worldTime = 0;
+	NewMap();
 }
 
 Player* Game::GetPlayer()
@@ -91,16 +86,30 @@ void Game::Update(const double delta)
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		GetCar(i)->Update(delta, playerSpeed);
 	}
+	UpdateMap();
+}
+
+void Game::UpdateMap()
+{
+	
 }
 
 void Game::NewMap()
 {
 	this->map = new char[mapHeight * mapWidth];
-	for (int i = 0; i < mapHeight * mapWidth; i++)
-		this->map[i] = grass;
+	for (int y = 0; y < mapHeight; y++) {
+		for (int x = 0; x < mapWidth; x++) {
+			if (x == 0 || x == mapWidth - 1)
+				SetMapTile(x, y, mapTile::grass);
+			else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (y % 6 < 3))
+				SetMapTile(x, y, mapTile::stripes);
+			else
+				SetMapTile(x, y, mapTile::road);
+		}
+	}
 }
 
-char Game::GetMap(const int x, const int y)
+char Game::GetMapTile(const int x, const int y)
 {
 	return map[y * mapWidth + x];
 }
@@ -110,9 +119,19 @@ char* Game::GetMap()
 	return map;
 }
 
-void Game::SetMap(const int x, const int y, const char value)
+void Game::SetMapTile(const int x, const int y, const char value)
 {
 	map[y * mapWidth + x] = value;
+}
+
+int Game::GetMapWidth()
+{
+	return mapWidth;
+}
+
+int Game::GetMapHeight()
+{
+	return mapHeight;
 }
 
 

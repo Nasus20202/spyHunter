@@ -3,16 +3,24 @@
 #include"./SDL2-2.0.10/include/SDL_main.h"
 #include "sprite.h"
 #include "car.h"
+#define MAP_WIDTH 100
+#define MAP_HEIGHT 100
+
+enum mapTile : char {
+	road = 'r',
+	grass = 'g',
+	stripes = 's',
+};
 
 class Game {
 private:
 	Car* *cars;
 	Player* player;
-	int carsAmount = 0, mapHeight, mapWidth;
+	int carsAmount = 0, mapWidth, mapHeight;
 	double worldTime = 0;
 	char* map;
 public:
-	Game(const int mapHeight = 0, const int mapWidth = 0);
+	Game(const int mapWidth = MAP_WIDTH, const int mapHeight = MAP_HEIGHT);
 	~Game();
 	void AddCar(Car* car);
 	void RemoveCar(const int index);
@@ -25,7 +33,10 @@ public:
 
 	void Update(const double delta);
 	void NewMap();
-	char GetMap(const int x, const int y);
+	void UpdateMap();
+	char GetMapTile(const int x, const int y);
 	char* GetMap();
-	void SetMap(const int x, const int y, const char value);
+	void SetMapTile(const int x, const int y, const char value);
+	int GetMapWidth();
+	int GetMapHeight();
 };

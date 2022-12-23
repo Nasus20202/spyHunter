@@ -52,8 +52,8 @@ class Gui {
 private:
 	Game* game;
 	bool quit = false;
-	int t1, t2, frames = 0, spritesCount = 0;
-	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps;
+	int t1, t2, frames = 0, spritesCount = 0, width, height;
+	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps, updateTime, frameTime;
 	SDL_Event event;
 	SDL_Surface* screen, *charsetBig, *charsetSmall;
 	SDL_Surface* *sprites;
@@ -70,14 +70,14 @@ private:
 	void DrawPixel(const Point point = {0, 0}, Uint32 color = BLACK);
 	void DrawLine(SDL_Surface* screen, const Point point, const int length, const int dx, const int dy, Uint32 color = BLACK);
 	void DrawLine(const Point point = { 0, 0 }, const int length = 1, const int dx = 1, const int dy = 1, Uint32 color = BLACK);
-	void DrawRectangle(SDL_Surface* screen, const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor);
-	void DrawRectangle(const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor);
+	void DrawRectangle(SDL_Surface* screen, const Point point, const int width, const int height, Uint32 color);
+	void DrawRectangle(const Point point, const int width, const int height, Uint32 color = BLACK);
 	void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const Point point);
 	void DrawSurface(SDL_Surface * sprite, const Point point);
 
 	void NewGame();
 	
-	void Initialize(const int width, const int height);
+	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
 	void LoadSprite(const char* path);
 	void Update();
@@ -86,6 +86,6 @@ private:
 	void GameInput();
 	void Exit();
 public:
-	Gui(const int width = SCREEN_WIDTH, const int height = SCREEN_HEIGHT);
+	Gui(const int width = SCREEN_WIDTH, const int height = SCREEN_HEIGHT, const double updateTime = UPDATE_TIME, const double frameTime = FRAME_TIME, const char* title = TITLE);
 	~Gui();
 };

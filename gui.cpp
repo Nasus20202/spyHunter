@@ -63,19 +63,18 @@ void Gui::DrawLine(const Point point, const int length, const int dx, const int 
 	DrawLine(screen, point, length, dx, dy, color);
 }
 
-void Gui::DrawRectangle(SDL_Surface* screen, const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor)
+void Gui::DrawRectangle(SDL_Surface* screen, const Point point, const int width, const int height, Uint32 color)
 {
-	int i;
-	DrawLine(screen, { point.x, point.y }, width, 0, 1, outlineColor);
-	DrawLine(screen, { point.x + width - 1, point.y }, height, 0, 1, outlineColor);
-	DrawLine(screen, { point.x, point.y }, width, 1, 0, outlineColor);
-	DrawLine(screen, { point.x, point.y + height - 1 }, width, 1, 0, outlineColor);
-	for (i = point.y + 1; i < point.y + height - 1; i++)
-		DrawLine(screen, { point.x + 1, i }, width - 2, 1, 0, fillColor);
+	SDL_Rect r;
+	r.x = point.x;
+	r.y = point.y;
+	r.w = width;
+	r.h = height;
+	SDL_FillRect(screen, &r, color);
 }
-void Gui::DrawRectangle(const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor)
+void Gui::DrawRectangle(const Point point, const int width, const int height, Uint32 color)
 {
-	DrawRectangle(screen, point, width, height, outlineColor, fillColor);
+	DrawRectangle(screen, point, width, height, color);
 }
 
 void Gui::DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const Point point)
@@ -102,7 +101,7 @@ void Gui::NewGame()
 }
 
 // create and customize GUI
-void Gui::Initialize(const int width, const int height) {
+void Gui::Initialize(const int width, const int height, const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
 		exit(1);
@@ -113,14 +112,14 @@ void Gui::Initialize(const int width, const int height) {
 		exit(1);
 	}
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_RenderSetLogicalSize(renderer, width, height);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_SetWindowTitle(window, TITLE);
-	screen = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32 ,0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+	SDL_SetWindowTitle(window, title);
+	screen = SDL_CreateRGBSurface(0, width, height, 32 ,0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
 	scrtex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
 		SDL_TEXTUREACCESS_STREAMING,
-		SCREEN_WIDTH, SCREEN_HEIGHT);
+		width, height);
 	SDL_ShowCursor(SDL_DISABLE);
 	currentKeyStates = SDL_GetKeyboardState(NULL);
 	
@@ -162,8 +161,35 @@ void Gui::Frame() {
 	// clear screen
 	SDL_FillRect(screen, NULL, GetRGB(BACKGROUND));
 
-	DrawRectangle({ 100, 100 }, 100, 100, GetRGB(FOREGROUND), GetRGB(FOREGROUND));
-	DrawText("Hello world", { 200, 200 });
+	// draw road
+	const int mapWidth = game->GetMapWidth(), mapHeight = game->GetMapHeight();
+	const double blockWidth = width / (double)mapWidth, blockHeight = height / (double)mapHeight;
+	for (int y = 0; y < mapHeight; y++) {
+		int roadWidth = 0; bool drawRoad = false;
+		for (int x = 0; x < mapWidth; x++) {
+			char tile = game->GetMapTile(x, y);
+			switch (tile) {
+			case mapTile::road:
+				roadWidth++;
+				break;
+			case mapTile::stripes:
+				DrawRectangle({ (int)(x * blockWidth), (int)(y * blockHeight)}, blockWidth, blockHeight+1, GetRGB(WHITE)); drawRoad = true;
+				break;
+			default:
+				drawRoad = true;
+				break;
+			}
+			if (drawRoad) {
+				DrawRectangle({ (int)((x - roadWidth) * blockWidth), (int)(y * blockHeight) }, roadWidth * blockWidth, blockHeight+1, GetRGB(FOREGROUND));
+				roadWidth = 0;
+				drawRoad = false;
+			}
+		}
+		if (roadWidth > 0) {
+			DrawRectangle({ (int)((mapWidth - roadWidth) * blockWidth), (int)(y * blockHeight) }, roadWidth * blockWidth, blockHeight+1, GetRGB(FOREGROUND));
+		}
+	}
+	
 
 	// draw cars
 	for (int i = 0; i < game->GetCarsAmount(); i++) {
@@ -175,6 +201,7 @@ void Gui::Frame() {
 	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
 	// print game info
+	DrawRectangle(Point(3, 3), 100, 38, GetRGB(BLACK));
 	char info[128];
 	sprintf_s(info, "FPS: %.0lf", fps);
 	DrawText(info, Point(5, 5), false);
@@ -229,13 +256,13 @@ void Gui::Update() {
 		fpsTimer -= 0.5;
 	}
 	// update screen
-	if (frameTimer >= FRAME_TIME) {
+	if (frameTimer >= frameTime) {
 		Frame();
 		frames++;
 		frameTimer = 0;
 	}
 	// update game state
-	if (updateTimer >= UPDATE_TIME) {
+	if (updateTimer >= updateTime) {
 		// handle events
 		while (SDL_PollEvent(&event) != 0) {
 			if (event.type == SDL_KEYDOWN) {
@@ -266,9 +293,13 @@ void Gui::Exit() {
 }
 
 	
-Gui::Gui(const int width, const int height) {
-	game = new Game(width, height);
-	Initialize(width, height);
+Gui::Gui(const int width, const int height, const double updateTime, const double frameTime, const char* title) {
+	game = new Game();
+	this->width = width;
+	this->height = height;
+	this->updateTime = updateTime;
+	this->frameTime = frameTime;
+	Initialize(width, height, title);
 }
 
 Gui::~Gui() {
