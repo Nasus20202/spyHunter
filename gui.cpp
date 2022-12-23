@@ -20,7 +20,7 @@ SDL_Surface* Gui::LoadSurface(const char* name) {
 	return surface;
 }
 
-void Gui::DrawText(SDL_Surface* screen, int x, int y, const char* text, SDL_Surface* charset, int fontSize) {
+void Gui::DrawText(SDL_Surface* screen, Point point, const char* text, SDL_Surface* charset, int fontSize) {
 	int px, py, c;
 	SDL_Rect s, d;
 	s.w = s.h = d.w = d.h = fontSize;
@@ -30,52 +30,52 @@ void Gui::DrawText(SDL_Surface* screen, int x, int y, const char* text, SDL_Surf
 		py = (c / 16) * fontSize;
 		s.x = px;
 		s.y = py;
-		d.x = x;
-		d.y = y;
+		d.x = point.x;
+		d.y = point.y;
 		SDL_BlitSurface(charset, &s, screen, &d);
-		x += fontSize;
+		point.x += fontSize;
 		text++;
 	};
 };
-void Gui::DrawText(const char* text, const int x, const int y, bool big) {
-	DrawText(screen, x, y, text, big ? charsetBig : charsetSmall, big ? FONT_SIZE_BIG : FONT_SIZE_SMALL);
+void Gui::DrawText(const char* text, const Point point, bool big) {
+	DrawText(screen, point, text, big ? charsetBig : charsetSmall, big ? FONT_SIZE_BIG : FONT_SIZE_SMALL);
 }
 
-void Gui::DrawPixel(SDL_Surface* surface, const int x, const int y, Uint32 color)
+void Gui::DrawPixel(SDL_Surface* surface, const Point point, Uint32 color)
 {
-	if (x < 0 || x >= surface->w || y < 0 || y >= surface->h) return;
+	if (point.x < 0 || point.x >= surface->w || point.y < 0 || point.y >= surface->h) return;
 	int bpp = surface->format->BytesPerPixel;
-	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
+	Uint8* p = (Uint8*)surface->pixels + point.y * surface->pitch + point.x * bpp;
 	*(Uint32*)p = color;
 }
-void Gui::DrawPixel(const int x, const int y, Uint32 color)
+void Gui::DrawPixel(const Point point, Uint32 color)
 {
-	DrawPixel(screen, x, y, color);
+	DrawPixel(screen, point, color);
 }
 
-void Gui::DrawLine(SDL_Surface* screen, const int x, const int y, const int length, const int dx, const int dy, Uint32 color)
+void Gui::DrawLine(SDL_Surface* screen, const Point point, const int length, const int dx, const int dy, Uint32 color)
 {
 	for (int i = 0; i < length; i++)
-		DrawPixel(screen, x + i * dx, y + i * dy, color);
+		DrawPixel(screen, { point.x + i * dx, point.y + i * dy }, color);
 }
-void Gui::DrawLine(const int x, const int y, const int length, const int dx, const int dy, Uint32 color)
+void Gui::DrawLine(const Point point, const int length, const int dx, const int dy, Uint32 color)
 {
-	DrawLine(screen, x, y, length, dx, dy, color);
+	DrawLine(screen, point, length, dx, dy, color);
 }
 
-void Gui::DrawRectangle(SDL_Surface* screen, const int x, const int y, const int width, const int height, Uint32 outlineColor, Uint32 fillColor)
+void Gui::DrawRectangle(SDL_Surface* screen, const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor)
 {
 	int i;
-	DrawLine(screen, x, y, width, 0, 1, outlineColor);
-	DrawLine(screen, x + width - 1, y, height, 0, 1, outlineColor);
-	DrawLine(screen, x, y, width, 1, 0, outlineColor);
-	DrawLine(screen, x, y + height - 1, width, 1, 0, outlineColor);
-	for (i = y + 1; i < y + height - 1; i++)
-		DrawLine(screen, x + 1, i, width - 2, 1, 0, fillColor);
+	DrawLine(screen, { point.x, point.y }, width, 0, 1, outlineColor);
+	DrawLine(screen, { point.x + width - 1, point.y }, height, 0, 1, outlineColor);
+	DrawLine(screen, { point.x, point.y }, width, 1, 0, outlineColor);
+	DrawLine(screen, { point.x, point.y + height - 1 }, width, 1, 0, outlineColor);
+	for (i = point.y + 1; i < point.y + height - 1; i++)
+		DrawLine(screen, { point.x + 1, i }, width - 2, 1, 0, fillColor);
 }
-void Gui::DrawRectangle(const int x, const int y, const int width, const int height, Uint32 outlineColor, Uint32 fillColor)
+void Gui::DrawRectangle(const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor)
 {
-	DrawRectangle(screen, x, y, width, height, outlineColor, fillColor);
+	DrawRectangle(screen, point, width, height, outlineColor, fillColor);
 }
 
 void Gui::DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const int x, const int y)
@@ -163,8 +163,8 @@ void Gui::Frame() {
 	// clear screen
 	SDL_FillRect(screen, NULL, GetRGB(BACKGROUND));
 
-	DrawRectangle(100, 100, 100, 100, GetRGB(FOREGROUND), GetRGB(FOREGROUND));
-	DrawText("Hello world", 200, 200);
+	DrawRectangle({ 100, 100 }, 100, 100, GetRGB(FOREGROUND), GetRGB(FOREGROUND));
+	DrawText("Hello world", { 200, 200 });
 
 	// draw cars
 	for (int i = 0; i < game.GetCarsAmount(); i++) {
@@ -178,11 +178,11 @@ void Gui::Frame() {
 	// print game info
 	char info[128];
 	sprintf_s(info, "FPS: %.0lf", fps);
-	DrawText(info, 5, 5, false);
+	DrawText(info, Point(5, 5), false);
 	sprintf_s(info, "Time: %.1lfs", worldTime);
-	DrawText(info, 5, 17, false);
+	DrawText(info, Point(5, 17) , false);
 	sprintf_s(info, "Speed: %.0lf", game.GetPlayer()->GetSpeed());
-	DrawText(info, 5, 29, false);
+	DrawText(info, Point(5, 29), false);
 	
 	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -276,3 +276,5 @@ Gui::Gui(const int width, const int height) {
 Gui::~Gui() {
 	Exit();
 }
+
+Point::Point(const int x, const int y) : x(x), y(y) {}
