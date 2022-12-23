@@ -3,6 +3,6 @@
 #undef main
 
 int main() {
-	Gui* gui = new Gui();
+	Gui gui = Gui::Gui();
 	return 0;
 }

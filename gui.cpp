@@ -290,6 +290,7 @@ void Gui::Exit() {
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	delete[] sprites;
+	delete game;
 }
 
 	
