@@ -14,8 +14,6 @@
 // files to be loaded as sprites
 #define ASSETS  "assets/player.bmp", "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp", \
 				"assets/whitecar.bmp", "assets/yellowcar.bmp", "assets/pinkcar.bmp"
-#define FPS_CAP 250
-#define UPDATE_RATE (1/((double)FPS_CAP))
 // frames per second cap
 #define FPS_CAP 250
 #define FRAME_TIME (1/((double)FPS_CAP))
@@ -74,8 +72,8 @@ private:
 	void DrawLine(const Point point = { 0, 0 }, const int length = 1, const int dx = 1, const int dy = 1, Uint32 color = BLACK);
 	void DrawRectangle(SDL_Surface* screen, const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor);
 	void DrawRectangle(const Point point, const int width, const int height, Uint32 outlineColor, Uint32 fillColor);
-	void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const int x, const int y);
-	void DrawSurface(SDL_Surface * sprite, const int x = 0, const int y = 0);
+	void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const Point point);
+	void DrawSurface(SDL_Surface * sprite, const Point point);
 
 	void NewGame();
 	

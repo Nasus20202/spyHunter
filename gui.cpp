@@ -78,23 +78,23 @@ void Gui::DrawRectangle(const Point point, const int width, const int height, Ui
 	DrawRectangle(screen, point, width, height, outlineColor, fillColor);
 }
 
-void Gui::DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const int x, const int y)
+void Gui::DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, const Point point)
 {
 	SDL_Rect dest;
-	dest.x = x - sprite->w / 2;
-	dest.y = y - sprite->h / 2;
+	dest.x = point.x - sprite->w / 2;
+	dest.y = point.y - sprite->h / 2;
 	dest.w = sprite->w;
 	dest.h = sprite->h;
 	SDL_BlitSurface(sprite, NULL, screen, &dest);
 }
-void Gui::DrawSurface(SDL_Surface* sprite, const int x, const int y)
+void Gui::DrawSurface(SDL_Surface* sprite, const Point point)
 {
-	DrawSurface(screen, sprite, x, y);
+	DrawSurface(screen, sprite, point);
 }
 
 void Gui::NewGame()
 {
-	Player* player = new Player(sprites[0], SCREEN_WIDTH / 2, SCREEN_HEIGHT * 0.8);
+	Player* player = new Player(sprites[0], (int) (SCREEN_WIDTH / 2), (int) (SCREEN_HEIGHT * 0.8));
 	game.NewGame(player);
 	// add temp cars
 	for (int i = 1; i <= 7; i++)
@@ -169,11 +169,11 @@ void Gui::Frame() {
 	// draw cars
 	for (int i = 0; i < game.GetCarsAmount(); i++) {
 		Car* car = game.GetCar(i);
-		DrawSurface(car->GetSurface(), car->GetX(), car->GetY());
+		DrawSurface(car->GetSurface(), { car->GetX(), car->GetY() });
 	}
 	// draw player
 	Player* player = game.GetPlayer();
-	DrawSurface(player->GetSurface(), player->GetX(), player->GetY());
+	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
 	// print game info
 	char info[128];
