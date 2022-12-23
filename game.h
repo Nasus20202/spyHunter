@@ -4,7 +4,8 @@
 #include "sprite.h"
 #include "car.h"
 #define MAP_WIDTH 100
-#define MAP_HEIGHT 100
+#define MAP_HEIGHT 200
+#define TILE_HEIGHT 10
 
 enum mapTile : char {
 	road = 'r',
@@ -17,8 +18,10 @@ private:
 	Car* *cars;
 	Player* player;
 	int carsAmount = 0, mapWidth, mapHeight;
-	double worldTime = 0;
+	double worldTime = 0, distance = 0, distanceDiff = 0; int frame = 0;
 	char* map;
+	void SetMapTile(const int x, const int y, const char value, char* map);
+	char GetMapTile(const int x, const int y, char* map);
 public:
 	Game(const int mapWidth = MAP_WIDTH, const int mapHeight = MAP_HEIGHT);
 	~Game();
@@ -30,6 +33,7 @@ public:
 	Car** GetCars();
 	int GetCarsAmount();
 	double GetTime();
+	double GetDistance();
 
 	void Update(const double delta);
 	void NewMap();

@@ -46,7 +46,8 @@ void Game::NewGame(Player* player)
 	carsAmount = 0;
 	delete this->player;
 	this->player = player;
-	worldTime = 0;
+	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0;
+	frame = 0;
 	NewMap();
 }
 
@@ -77,6 +78,11 @@ double Game::GetTime()
 	return worldTime;
 }
 
+double Game::GetDistance()
+{
+	return distance;
+}
+
 void Game::Update(const double delta)
 {
 	worldTime += delta;
@@ -86,12 +92,34 @@ void Game::Update(const double delta)
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		GetCar(i)->Update(delta, playerSpeed);
 	}
-	UpdateMap();
+	double localDiff = playerSpeed * delta;
+	distanceDiff += localDiff;
+	distance += localDiff;
+	if (distanceDiff > TILE_HEIGHT) {
+		UpdateMap(); frame++;
+		distanceDiff -=TILE_HEIGHT;
+
+	}
 }
 
 void Game::UpdateMap()
 {
-	
+	char* newMap = new char[mapWidth * mapHeight];
+	for (int y = 0; y < mapHeight - 1; y++) {
+		for (int x = 0; x < mapWidth; x++) {
+			newMap[(y + 1) * mapWidth + x] = GetMapTile(x, y);
+		}
+	}
+	for (int x = 0; x < mapWidth; x++) {
+		if (x == 0 || x == mapWidth - 1)
+			SetMapTile(x, 0, mapTile::grass, newMap);
+		else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (frame % 20 < 7))
+			SetMapTile(x, 0, mapTile::stripes, newMap);
+		else
+			SetMapTile(x, 0, mapTile::road, newMap);
+	}
+	delete[] map;
+	map = newMap;
 }
 
 void Game::NewMap()
@@ -101,7 +129,7 @@ void Game::NewMap()
 		for (int x = 0; x < mapWidth; x++) {
 			if (x == 0 || x == mapWidth - 1)
 				SetMapTile(x, y, mapTile::grass);
-			else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (y % 6 < 3))
+			else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (y % 20 < 7))
 				SetMapTile(x, y, mapTile::stripes);
 			else
 				SetMapTile(x, y, mapTile::road);
@@ -111,6 +139,11 @@ void Game::NewMap()
 
 char Game::GetMapTile(const int x, const int y)
 {
+	return GetMapTile(x, y, map);
+}
+
+char Game::GetMapTile(const int x, const int y, char* map)
+{
 	return map[y * mapWidth + x];
 }
 
@@ -119,9 +152,14 @@ char* Game::GetMap()
 	return map;
 }
 
-void Game::SetMapTile(const int x, const int y, const char value)
+void Game::SetMapTile(const int x, const int y, const char value, char* map)
 {
 	map[y * mapWidth + x] = value;
+}
+
+void Game::SetMapTile(const int x, const int y, const char value)
+{
+	SetMapTile(x, y, value, map);
 }
 
 int Game::GetMapWidth()

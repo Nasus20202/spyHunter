@@ -3,7 +3,7 @@
 #include"./SDL2-2.0.10/include/SDL_main.h"
 #include "sprite.h"
 #define ACCELERATION 2
-#define MAX_SPEED 2000
+#define MAX_SPEED 3000
 
 class Car : public Sprite {
 protected:
