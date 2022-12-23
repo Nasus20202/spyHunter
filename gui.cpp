@@ -102,6 +102,7 @@ void Gui::NewGame()
 	worldTime = 0;
 }
 
+// create and customize GUI
 void Gui::Initialize(const int width, const int height) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
@@ -141,10 +142,9 @@ void Gui::Initialize(const int width, const int height) {
 	}
 }
 
+// load all sprites
 void Gui::LoadSprites() {
-	// files to be loaded as sprites
-	const char* names[] = {  "assets/player.bmp", "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp",
-							 "assets/whitecar.bmp" , "assets/yellowcar.bmp", "assets/pinkcar.bmp"};
+	const char* names[] = { ASSETS };
 	for (const char* name : names) {
 		LoadSprite(name);
 	}

@@ -6,10 +6,14 @@
 #define SCREEN_HEIGHT 720
 #define SCREEN_WIDTH 1280
 #define TITLE "Spy Hunter"
+// fonts
 #define CHARSET_BIG "assets/cs16x16.bmp"
 #define CHARSET_SMALL "assets/cs8x8.bmp"
 #define FONT_SIZE_BIG 16
 #define FONT_SIZE_SMALL 8
+// files to be loaded as sprites
+#define ASSETS  "assets/player.bmp", "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp", \
+				"assets/whitecar.bmp", "assets/yellowcar.bmp", "assets/pinkcar.bmp"
 #define FPS_CAP 250
 #define UPDATE_RATE (1/((double)FPS_CAP))
 
