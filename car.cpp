@@ -1,4 +1,5 @@
 #include "car.h"
+#include "game.h"
 #include <cmath>
 
 #pragma region Car
@@ -69,6 +70,13 @@
 	{
 		double speed = this->GetSpeed();
 		return pow(speed, 0.5) * 0.1;
+	}
+
+	bool Player::CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map)
+	{
+		const int mapWidth = map->GetWidth(), mapHeight = map->GetHeight();
+		const double blockWidth = screenWidth / (double)mapWidth, blockHeight = screenWidth / (double)mapHeight;
+		return false;
 	}
 
 	void Player::Update()

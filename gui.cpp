@@ -97,7 +97,7 @@ void Gui::NewGame()
 	game->NewGame(player);
 	// add temp cars
 	for (int i = 1; i <= 7; i++)
-		game->AddCar(new Car(sprites[i], (i + 1) * 100, 600, (i + 1) * 50));
+		game->AddCar(new Car(sprites[i], (i + 1) * 100, 400, (i + 1) * 50));
 }
 
 // create and customize GUI
@@ -295,7 +295,7 @@ void Gui::Exit() {
 
 	
 Gui::Gui(const int width, const int height, const double updateTime, const double frameTime, const char* title) {
-	game = new Game();
+	game = new Game(width, height);
 	this->width = width;
 	this->height = height;
 	this->updateTime = updateTime;

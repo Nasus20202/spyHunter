@@ -66,3 +66,14 @@ int Sprite::GetY()
 {
 	return (int)y;
 }
+
+bool Sprite::CheckForCollision(Sprite* sprite)
+{
+	int thisXOffset = this->GetSurface()->w / 2, thisYOffset = this->GetSurface()->h / 2,
+		otherXOffset = sprite->GetSurface()->w / 2, otherYOffset = sprite->GetSurface()->h / 2;
+	int thisX = this->GetX(), thisY = this->GetY(), otherX = sprite->GetX(), otherY = sprite->GetY();
+	if (thisX + thisXOffset > otherX - otherXOffset && thisX - thisXOffset < otherX + otherXOffset)
+		if (thisY + thisYOffset > otherY - otherYOffset && thisY - thisYOffset < otherY + otherYOffset)
+			return true;
+	return false;
+}

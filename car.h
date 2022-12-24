@@ -2,6 +2,7 @@
 #include"./SDL2-2.0.10/include/SDL.h"
 #include"./SDL2-2.0.10/include/SDL_main.h"
 #include "sprite.h"
+#include "map.h"
 #define ACCELERATION 2
 #define MAX_SPEED 3000
 
@@ -29,6 +30,5 @@ public:
 	void Left();
 	void Update();
 	double SteeringSpeed();
-	bool CheckForCollisionWithSprite(Sprite* sprite);
-	//bool CheckForCollisionWithMap(char* map,)
+	bool CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map);
 };

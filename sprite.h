@@ -20,4 +20,5 @@ public:
 	void Update(const double delta);
 	int GetX();
 	int GetY();
+	bool CheckForCollision(Sprite* sprite);
 };
