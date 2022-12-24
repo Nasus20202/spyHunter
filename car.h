@@ -29,4 +29,6 @@ public:
 	void Left();
 	void Update();
 	double SteeringSpeed();
+	bool CheckForCollisionWithSprite(Sprite* sprite);
+	//bool CheckForCollisionWithMap(char* map,)
 };

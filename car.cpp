@@ -12,7 +12,7 @@
 
 	Car::~Car()
 	{
-		int a = 2;
+		
 	}
 
 	void Car::SetSpeed(double speed)
