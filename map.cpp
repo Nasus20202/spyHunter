@@ -2,7 +2,7 @@
 
 Map::Map(const int mapWidth, const int mapHeight)
 {
-	this->map = new mapTile[mapHeight * mapWidth];
+	this->map = new MapTile[mapHeight * mapWidth];
 	this->mapWidth = mapWidth;
 	this->mapHeight = mapHeight;
 }
@@ -12,21 +12,21 @@ Map::~Map()
 	delete[] map;
 }
 
-mapTile* Map::GetMap()
+MapTile* Map::GetMap()
 {
 	return map;
 }
 
 
-mapTile Map::GetMapTile(const int x, const int y)
+MapTile Map::GetMapTile(const int x, const int y)
 {
 	int id = y * mapWidth + x;
 	if (id < 0 || id >= mapWidth * mapHeight)
-		return mapTile::grass;
+		return MapTile::grass;
 	return map[id];
 }
 
-void Map::SetMapTile(const int x, const int y, const mapTile value)
+void Map::SetMapTile(const int x, const int y, const MapTile value)
 {
 	int id = y * mapWidth + x;
 	if (id < 0 || id >= mapWidth * mapHeight)

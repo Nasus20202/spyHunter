@@ -30,5 +30,5 @@ public:
 	void Left();
 	void Update();
 	double SteeringSpeed();
-	mapTile CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map);
+	MapTile CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map);
 };

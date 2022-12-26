@@ -118,7 +118,7 @@ bool Game::CheckForCollision()
 			printf("Car %d\n", i);
 		}
 	}
-	if (player->CheckForCollisionWithMap(screenWidth, screenHeight, map) == mapTile::grass) {
+	if (player->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
 		result = true;
 		printf("Map\n");
 	}
@@ -134,11 +134,11 @@ void Game::UpdateMap()
 	}
 	for (int x = 0; x < mapWidth; x++) {
 		if (x <= 10 || x >= mapWidth - 10)
-			SetMapTile(x, 0, mapTile::grass);
+			SetMapTile(x, 0, MapTile::grass);
 		else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (frame % 20 < 7))
-			SetMapTile(x, 0, mapTile::stripes);
+			SetMapTile(x, 0, MapTile::stripes);
 		else
-			SetMapTile(x, 0, mapTile::road);
+			SetMapTile(x, 0, MapTile::road);
 	}
 }
 
@@ -149,16 +149,16 @@ void Game::NewMap()
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {
 			if (x == 0 || x == mapWidth - 1)
-				SetMapTile(x, y, mapTile::grass);
+				SetMapTile(x, y, MapTile::grass);
 			else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (y % 20 < 7))
-				SetMapTile(x, y, mapTile::stripes);
+				SetMapTile(x, y, MapTile::stripes);
 			else
-				SetMapTile(x, y, mapTile::road);
+				SetMapTile(x, y, MapTile::road);
 		}
 	}
 }
 
-mapTile Game::GetMapTile(const int x, const int y)
+MapTile Game::GetMapTile(const int x, const int y)
 {
 	return map->GetMapTile(x, y);
 }
@@ -168,7 +168,7 @@ Map* Game::GetMap()
 	return map;
 }
 
-void Game::SetMapTile(const int x, const int y, const mapTile value)
+void Game::SetMapTile(const int x, const int y, const MapTile value)
 {
 	map->SetMapTile(x, y, value);
 }

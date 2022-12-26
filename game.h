@@ -12,8 +12,8 @@ class Game {
 private:
 	Car* *cars;
 	Player* player;
-	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight;
-	double worldTime = 0, distance = 0, distanceDiff = 0; int frame = 0;
+	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0;
+	double worldTime = 0, distance = 0, distanceDiff = 0;
 	Map* map;
 public:
 	Game(const int screenWidth, const int screenHeight, const int mapWidth = MAP_WIDTH, const int mapHeight = MAP_HEIGHT);
@@ -33,9 +33,9 @@ public:
 	bool CheckForCollision();
 	
 	void UpdateMap();
-	mapTile GetMapTile(const int x, const int y);
+	MapTile GetMapTile(const int x, const int y);
 	Map* GetMap();
-	void SetMapTile(const int x, const int y, const mapTile value);
+	void SetMapTile(const int x, const int y, const MapTile value);
 	int GetMapWidth();
 	int GetMapHeight();
 

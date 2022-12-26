@@ -48,10 +48,18 @@ public:
 	int x, y;
 };
 
+enum class State : char {
+	playing,
+	paused,
+	dead,
+	menu,
+	quit
+};
+
 class Gui {
 private:
 	Game* game;
-	bool quit = false;
+	State state;
 	int t1, t2, frames = 0, spritesCount = 0, width, height;
 	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps, updateTime, frameTime;
 	SDL_Event event;
@@ -80,6 +88,7 @@ private:
 	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
 	void LoadSprite(const char* path);
+	void PrintMap();
 	void Update();
 	void Frame();
 	void Input(const SDL_Keycode code);

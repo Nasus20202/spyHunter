@@ -1,6 +1,6 @@
 #pragma once
 
-enum mapTile : char {
+enum class MapTile : char {
 	road = 'r',
 	grass = 'g',
 	stripes = 's',
@@ -8,14 +8,14 @@ enum mapTile : char {
 
 class Map {
 private:
-	mapTile* map;
+	MapTile* map;
 	int mapWidth, mapHeight;
 public:
 	Map(const int mapWidth, const int mapHeight);
 	~Map();
-	mapTile* GetMap();
+	MapTile* GetMap();
 	int GetWidth();
 	int GetHeight();
-	mapTile GetMapTile(const int x, const int y);
-	void SetMapTile(const int x, const int y, const mapTile value);
+	MapTile GetMapTile(const int x, const int y);
+	void SetMapTile(const int x, const int y, const MapTile value);
 };
