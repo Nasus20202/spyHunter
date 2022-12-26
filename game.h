@@ -9,13 +9,22 @@
 #define TILE_HEIGHT 10
 #define SCORE_DIVIDER 100
 
+enum class State : char {
+	playing,
+	paused,
+	dead,
+	menu,
+	quit
+};
+
 class Game {
 private:
 	Car* *cars;
 	Player* player;
-	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, score;
-	double worldTime = 0, distance = 0, distanceDiff = 0;
+	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0;
+	double worldTime = 0, distance = 0, distanceDiff = 0, score;
 	Map* map;
+	State state;
 public:
 	Game(const int screenWidth, const int screenHeight, const int mapWidth = MAP_WIDTH, const int mapHeight = MAP_HEIGHT);
 	~Game();
@@ -41,6 +50,9 @@ public:
 	int GetMapWidth();
 	int GetMapHeight();
 	int GetScore();
+
+	State GetState();
+	void SetState(State state);
 
 	int Random(const int from, const int to);
 };

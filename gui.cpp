@@ -95,7 +95,7 @@ void Gui::NewGame()
 {
 	Player* player = new Player(sprites[0], (int) (SCREEN_WIDTH / 2), (int) (SCREEN_HEIGHT * 0.8));
 	game->NewGame(player);
-	state = State::playing;
+	game->SetState(State::playing);
 	// add temp cars
 	for (int i = 1; i <= 7; i++)
 		game->AddCar(new Car(sprites[i], (i + 1) * 100, 400, (i + 1) * 50));
@@ -130,7 +130,7 @@ void Gui::Initialize(const int width, const int height, const char* title) {
 	NewGame();
 	SDL_SetColorKey(charsetBig, true, 0x000000); SDL_SetColorKey(charsetSmall, true, 0x000000);
 	t1 = SDL_GetTicks();
-	while (state != State::quit) {
+	while (game->GetState() != State::quit) {
 		Update();
 	}
 }
@@ -196,7 +196,7 @@ void Gui::Frame() {
 void Gui::Input(const SDL_Keycode key) {
 	switch (key) {
 	case SDLK_ESCAPE:
-		state = State::quit; break;
+		game->SetState(State::quit); break;
 	case SDLK_n:
 		NewGame(); break;
 	}
@@ -245,7 +245,7 @@ void Gui::Update() {
 				Input(event.key.keysym.sym); // key down event
 			}
 			else if (event.type == SDL_QUIT) {
-				state = State::quit;
+				game->SetState(State::quit);
 			}
 		}
 		// handle pressed keys, this happens every game update

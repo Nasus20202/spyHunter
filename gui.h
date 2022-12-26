@@ -48,18 +48,10 @@ public:
 	int x, y;
 };
 
-enum class State : char {
-	playing,
-	paused,
-	dead,
-	menu,
-	quit
-};
 
 class Gui {
 private:
 	Game* game;
-	State state;
 	int t1, t2, frames = 0, spritesCount = 0, width, height;
 	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps, updateTime, frameTime;
 	SDL_Event event;

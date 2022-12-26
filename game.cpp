@@ -103,7 +103,7 @@ void Game::Update(const double delta)
 	if (distanceDiff > TILE_HEIGHT) {
 		UpdateMap(); frame++;
 		distanceDiff -=TILE_HEIGHT;
-		score++;
+		score+=(1/(double)SCORE_DIVIDER);
 	}
 	CheckForCollision();
 }
@@ -118,7 +118,8 @@ bool Game::CheckForCollision()
 			printf("Car %d\n", i);
 		}
 	}
-	if (player->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
+	MapTile tile = player->CheckForCollisionWithMap(screenWidth, screenHeight, map);
+	if (tile == MapTile::grass) {
 		result = true;
 		printf("Map\n");
 	}
@@ -191,7 +192,17 @@ int Game::GetMapHeight()
 
 int Game::GetScore()
 {
-	return score / SCORE_DIVIDER;
+	return score;
+}
+
+State Game::GetState()
+{
+	return state;
+}
+
+void Game::SetState(State state)
+{
+	this->state = state;
 }
 
 int Game::Random(const int from, const int to)
