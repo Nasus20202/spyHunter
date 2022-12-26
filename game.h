@@ -7,12 +7,13 @@
 #define MAP_WIDTH 100
 #define MAP_HEIGHT 200
 #define TILE_HEIGHT 10
+#define SCORE_DIVIDER 100
 
 class Game {
 private:
 	Car* *cars;
 	Player* player;
-	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0;
+	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, score;
 	double worldTime = 0, distance = 0, distanceDiff = 0;
 	Map* map;
 public:
@@ -35,9 +36,11 @@ public:
 	void UpdateMap();
 	MapTile GetMapTile(const int x, const int y);
 	Map* GetMap();
+	void SetMap(Map* map);
 	void SetMapTile(const int x, const int y, const MapTile value);
 	int GetMapWidth();
 	int GetMapHeight();
+	int GetScore();
 
 	int Random(const int from, const int to);
 };

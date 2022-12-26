@@ -52,8 +52,7 @@ void Game::NewGame(Player* player)
 	carsAmount = 0;
 	delete this->player;
 	this->player = player;
-	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0;
-	frame = 0;
+	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0, frame = 0, score = 0;
 	NewMap();
 }
 
@@ -104,6 +103,7 @@ void Game::Update(const double delta)
 	if (distanceDiff > TILE_HEIGHT) {
 		UpdateMap(); frame++;
 		distanceDiff -=TILE_HEIGHT;
+		score++;
 	}
 	CheckForCollision();
 }
@@ -168,6 +168,12 @@ Map* Game::GetMap()
 	return map;
 }
 
+void Game::SetMap(Map* map)
+{
+	delete this->map;
+	this->map = map;
+}
+
 void Game::SetMapTile(const int x, const int y, const MapTile value)
 {
 	map->SetMapTile(x, y, value);
@@ -181,6 +187,11 @@ int Game::GetMapWidth()
 int Game::GetMapHeight()
 {
 	return map->GetHeight();
+}
+
+int Game::GetScore()
+{
+	return score / SCORE_DIVIDER;
 }
 
 int Game::Random(const int from, const int to)

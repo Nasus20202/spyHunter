@@ -175,7 +175,7 @@ void Gui::Frame() {
 	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
 	// print game info
-	DrawRectangle(Point(3, 3), 100, 38, GetRGB(BLACK));
+	DrawRectangle(Point(3, 3), 100, 48, GetRGB(BLACK));
 	char info[128];
 	sprintf_s(info, "FPS: %.0lf", fps);
 	DrawText(info, Point(5, 5), false);
@@ -183,6 +183,8 @@ void Gui::Frame() {
 	DrawText(info, Point(5, 17) , false);
 	sprintf_s(info, "Speed: %.0lf", game->GetPlayer()->GetSpeed());
 	DrawText(info, Point(5, 29), false);
+	sprintf_s(info, "Score: %d", game->GetScore());
+	DrawText(info, Point(5, 41), false);
 	
 	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -257,10 +259,11 @@ void Gui::PrintMap()
 {
 	const int mapWidth = game->GetMapWidth(), mapHeight = game->GetMapHeight();
 	const double blockWidth = width / (double)mapWidth, blockHeight = height / (double)mapHeight;
+	MapTile tile;
 	for (int y = 0; y < mapHeight; y++) {
 		int roadWidth = 0; bool drawRoad = false;
 		for (int x = 0; x < mapWidth; x++) {
-			MapTile tile = game->GetMapTile(x, y);
+			tile = game->GetMapTile(x, y);
 			switch (tile) {
 			case MapTile::road:
 				roadWidth++;

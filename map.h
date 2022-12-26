@@ -1,9 +1,9 @@
 #pragma once
 
 enum class MapTile : char {
-	road = 'r',
-	grass = 'g',
-	stripes = 's',
+	grass,
+	road,
+	stripes,
 };
 
 class Map {
