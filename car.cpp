@@ -72,11 +72,23 @@
 		return pow(speed, 0.5) * 0.1;
 	}
 
-	bool Player::CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map)
+	mapTile Player::CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map)
 	{
 		const int mapWidth = map->GetWidth(), mapHeight = map->GetHeight();
-		const double blockWidth = screenWidth / (double)mapWidth, blockHeight = screenWidth / (double)mapHeight;
-		return false;
+		const double blockWidth = screenWidth / (double)mapWidth, blockHeight = screenHeight / (double)mapHeight;
+		const int carX = this->GetX(), carY = this->GetY();
+		const int width = this->GetWidth(), height = this->GetHeight();
+		const int rightX = carX + width / 2, leftX = carX - width / 2, bottomY = carY + height / 2, topY = carY - height / 2;
+		const int rightBlock = rightX / blockWidth, leftBlock = leftX / blockWidth, bottomBlock = bottomY / blockHeight, topBlock = topY / blockHeight;
+		mapTile tile = mapTile::road;
+		for (int y = topBlock; y <= bottomBlock; y++)
+			for (int x = leftBlock; x <= rightBlock; x++) {
+				tile = map->GetMapTile(x, y);
+				if (tile == mapTile::grass) {
+					return tile;
+				}
+			}
+		return tile;
 	}
 
 	void Player::Update()

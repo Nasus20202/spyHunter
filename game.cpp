@@ -118,7 +118,7 @@ bool Game::CheckForCollision()
 			printf("Car %d\n", i);
 		}
 	}
-	if (player->CheckForCollisionWithMap(screenWidth, screenHeight, map)) {
+	if (player->CheckForCollisionWithMap(screenWidth, screenHeight, map) == mapTile::grass) {
 		result = true;
 		printf("Map\n");
 	}
@@ -144,6 +144,7 @@ void Game::UpdateMap()
 
 void Game::NewMap()
 {
+	delete map;
 	this->map = new Map(mapWidth, mapHeight);
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {

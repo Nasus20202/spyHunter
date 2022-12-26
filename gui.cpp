@@ -272,7 +272,7 @@ void Gui::Update() {
 				quit = true;
 			}
 		}
-		// handle pressed keys
+		// handle pressed keys, this happens every game update
 		GameInput();
 		game->Update(updateTimer); // update game state
 		updateTimer = 0;
