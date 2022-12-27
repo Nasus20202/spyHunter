@@ -1,6 +1,7 @@
 #include "game.h"
 #include <ctime>
 #include <cstdlib>
+#include <cstdio>
 
 Game::Game(const int screenWidth, const int screenHeight, const int mapWidth, const int mapHeight)
 {
@@ -66,6 +67,20 @@ void Game::NewPlayer()
 {
 	delete player;
 	player = new Player(sprites[PLAYER_SPRITE], screenWidth / 2, screenHeight * 0.8, 100);
+	int x = 0;
+	while (player->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
+		player->SetX(x);
+		x+=20;
+	}
+	bool noCollisionWithCars = false;
+	while (noCollisionWithCars) {
+		for (int i = 0; i < carsAmount; i++)
+			if (player->CheckForCollision(GetCar(i)) == true) {
+				RemoveCar(i);
+				break;
+			}
+		noCollisionWithCars = true;
+	}
 }
 
 Car* Game::GetCar(const int index)
@@ -157,20 +172,63 @@ void Game::UpdateMap()
 		}
 	}
 	// update generation values
-	int newTile = Random(-1, 1);
+	if (mapUpdate % GENERATION_DELAY == 0) {
+		const int quarter = mapWidth / 4, half = mapWidth / 2, threeQuarter = quarter * 3;
+		int rightDiff = Random(-1, 1), leftDiff = Random(-1, 1), islandDiff = Random(-1, 1);
+		if (rightRoadBorder >= half)
+			rightDiff = Random(-2, 1);
+		else if (rightRoadBorder >= threeQuarter)
+			rightDiff = Random(-3, 1);
+		if (leftRoadBorder <= half)
+			leftDiff = Random(-1, 2);
+		else if (leftRoadBorder <= quarter)
+			leftDiff = Random(-1, 3);
+		if (islandDiff < MIN_ISLAND_LENGHT)
+			islandDiff = Random(0, 1);
+		if (rightDiff < 0)
+			rightDiff = -3;
+		if (leftDiff > 0)
+			leftDiff = 1;
+		rightRoadBorder -= rightDiff;
+		leftRoadBorder += leftDiff;
+		trafficIsland += islandDiff;
+		if (rightRoadBorder < 0)
+			rightRoadBorder = 0;
+		if (leftRoadBorder > mapWidth - 1)
+			leftRoadBorder = mapWidth - 1;
+		int width = leftRoadBorder - rightRoadBorder - trafficIsland;
+		if (width < MIN_ROAD_WIDTH) {
+			int diff = MIN_ROAD_WIDTH - width;
+			if (leftRoadBorder < mapWidth / 2) {
+				leftRoadBorder += diff;
+			}
+			else if (rightRoadBorder >= mapWidth / 2) {
+				rightRoadBorder -= diff;
+			}
+			else {
+				leftRoadBorder += diff / 2;
+				rightRoadBorder -= diff / 2 + diff % 2;
+			}
+		}
+		printf("R: %d L: %d I: %d\n", rightRoadBorder, leftRoadBorder, trafficIsland);
+	}
 	
 	
 	// generate new map
 	const int roadWidth = leftRoadBorder - rightRoadBorder;
-	const int middle = rightRoadBorder + roadWidth / 2; 
+	const int middle = rightRoadBorder + roadWidth / 2; bool hasTrafficIsland = false;
 	for (int x = 0; x < mapWidth; x++) {
 		if (x < rightRoadBorder || x > leftRoadBorder)
 			SetMapTile(x, 0, MapTile::grass);
-		else if (trafficIsland > 0 && x >= middle - trafficIsland / 2 && x < middle + trafficIsland / 2) {
+		else if (trafficIsland > 0 && x > middle - (trafficIsland / 2 + 1) && x < middle + (trafficIsland / 2 + 1)) {
 			SetMapTile(x, 0, MapTile::grass);
+			hasTrafficIsland = true; islandLength++;
 		}
 		else
 			SetMapTile(x, 0, MapTile::road);
+	}
+	if (!hasTrafficIsland) {
+		islandLength = islandLength > 0 ? 0 : islandLength - 1;
 	}
 	// add stripes at borded of the road
 	for (int x = 0; x < mapWidth; x++) {
@@ -184,8 +242,8 @@ void Game::UpdateMap()
 
 void Game::NewMap()
 {
-	delete map;
-	rightRoadBorder = START_ROAD_WIDTH, leftRoadBorder = mapWidth - START_ROAD_WIDTH, trafficIsland = 0, mapUpdate = 0;
+	delete map; const int middle = mapWidth / 2;
+	rightRoadBorder = middle - START_ROAD_WIDTH / 2, leftRoadBorder = middle + START_ROAD_WIDTH / 2, trafficIsland = 0, islandLength = 0, mapUpdate = 0;
 	this->map = new Map(mapWidth, mapHeight);
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {

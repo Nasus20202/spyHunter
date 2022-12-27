@@ -21,7 +21,7 @@ MapTile* Map::GetMap()
 MapTile Map::GetMapTile(const int x, const int y)
 {
 	int id = y * mapWidth + x;
-	if (id < 0 || id >= mapWidth * mapHeight)
+	if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight)
 		return MapTile::grass;
 	return map[id];
 }

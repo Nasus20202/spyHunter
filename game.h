@@ -13,8 +13,10 @@
 #define CRASH_SPRITE 1
 #define MISSLE_SPRITE 2
 #define CARS_SPRITES_START 3
-#define START_ROAD_WIDTH 30
-#define MIN_ROAD_WIDTH 10
+#define START_ROAD_WIDTH 40
+#define MIN_ROAD_WIDTH 30
+#define GENERATION_DELAY 10
+#define MIN_ISLAND_LENGHT 10
 
 enum class State : char {
 	playing,
@@ -28,7 +30,7 @@ class Game {
 private:
 	Car* *cars;
 	Player* player;
-	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate;
+	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
 	double worldTime = 0, distance = 0, distanceDiff = 0, score;
 	Map* map;
 	State state;
