@@ -1,7 +1,6 @@
 #include "game.h"
 #include <ctime>
 #include <cstdlib>
-#include <cstdio>
 
 Game::Game(const int screenWidth, const int screenHeight, const int mapWidth, const int mapHeight)
 {
@@ -151,30 +150,48 @@ void Game::Crash() {
 
 void Game::UpdateMap()
 {
+	// copy old map
 	for (int y = mapHeight - 1; y >= 1; y--) {
 		for (int x = 0; x < mapWidth; x++) {
 			map->SetMapTile(x, y, map->GetMapTile(x, y - 1));
 		}
 	}
+	// update generation values
+	int newTile = Random(-1, 1);
+	
+	
+	// generate new map
+	const int roadWidth = leftRoadBorder - rightRoadBorder;
+	const int middle = rightRoadBorder + roadWidth / 2; 
 	for (int x = 0; x < mapWidth; x++) {
-		if (x <= 10 || x >= mapWidth - 10)
+		if (x < rightRoadBorder || x > leftRoadBorder)
 			SetMapTile(x, 0, MapTile::grass);
-		else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (frame % 20 < 7))
-			SetMapTile(x, 0, MapTile::stripes);
+		else if (trafficIsland > 0 && x >= middle - trafficIsland / 2 && x < middle + trafficIsland / 2) {
+			SetMapTile(x, 0, MapTile::grass);
+		}
 		else
 			SetMapTile(x, 0, MapTile::road);
 	}
+	// add stripes at borded of the road
+	for (int x = 0; x < mapWidth; x++) {
+		if (GetMapTile(x, 0) == MapTile::grass && GetMapTile(x + 1, 0) == MapTile::road)
+			SetMapTile(x + 1, 0, MapTile::stripes);
+		else if (GetMapTile(x, 0) == MapTile::road && GetMapTile(x + 1, 0) == MapTile::grass)
+			SetMapTile(x, 0, MapTile::stripes);
+	}
+	mapUpdate++;
 }
 
 void Game::NewMap()
 {
 	delete map;
+	rightRoadBorder = START_ROAD_WIDTH, leftRoadBorder = mapWidth - START_ROAD_WIDTH, trafficIsland = 0, mapUpdate = 0;
 	this->map = new Map(mapWidth, mapHeight);
 	for (int y = 0; y < mapHeight; y++) {
 		for (int x = 0; x < mapWidth; x++) {
-			if (x == 0 || x == mapWidth - 1)
+			if (x < rightRoadBorder || x > leftRoadBorder)
 				SetMapTile(x, y, MapTile::grass);
-			else if (x == 1 || x == mapWidth - 2 || x == mapWidth / 2 && (y % 20 < 7))
+			else if (x == rightRoadBorder || x == leftRoadBorder/*|| x == mapWidth / 2 && (y % 20 < 7)*/)
 				SetMapTile(x, y, MapTile::stripes);
 			else
 				SetMapTile(x, y, MapTile::road);
