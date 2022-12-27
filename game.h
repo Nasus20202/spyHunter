@@ -8,6 +8,11 @@
 #define MAP_HEIGHT 200
 #define TILE_HEIGHT 10
 #define SCORE_DIVIDER 100
+#define START_LIVES 3
+#define PLAYER_SPRITE 0
+#define CRASH_SPRITE 1
+#define MISSLE_SPRITE 2
+#define CARS_SPRITES_START 3
 
 enum class State : char {
 	playing,
@@ -21,35 +26,40 @@ class Game {
 private:
 	Car* *cars;
 	Player* player;
-	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0;
+	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives;
 	double worldTime = 0, distance = 0, distanceDiff = 0, score;
 	Map* map;
 	State state;
+	SDL_Surface** sprites; int spritesAmount;
 public:
 	Game(const int screenWidth, const int screenHeight, const int mapWidth = MAP_WIDTH, const int mapHeight = MAP_HEIGHT);
 	~Game();
 	void AddCar(Car* car);
 	void RemoveCar(const int index);
-	void NewGame(Player* player);
+	void NewGame();
 	Player* GetPlayer();
+	void NewPlayer();
 	Car* GetCar(const int index);
 	Car** GetCars();
 	int GetCarsAmount();
 	double GetTime();
 	double GetDistance();
+	int GetScore();
+	int GetLives();
 
 	void Update(const double delta);
 	void NewMap();
 	bool CheckForCollision();
+	void Crash();
 	
 	void UpdateMap();
 	MapTile GetMapTile(const int x, const int y);
 	Map* GetMap();
+	void SetSprites(SDL_Surface** sprites, const int amount);
 	void SetMap(Map* map);
 	void SetMapTile(const int x, const int y, const MapTile value);
 	int GetMapWidth();
 	int GetMapHeight();
-	int GetScore();
 
 	State GetState();
 	void SetState(State state);

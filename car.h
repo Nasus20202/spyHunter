@@ -6,13 +6,23 @@
 #define ACCELERATION 2
 #define MAX_SPEED 3000
 
+enum class CarType : char {
+	player,
+	civil,
+	enemy,
+	crashed,
+	crashedPlayer
+};
+
 class Car : public Sprite {
 protected:
 	double speed;
+	CarType type;
 public:
-	Car(SDL_Surface* sprite, int x, int y, double speed);
+	Car(SDL_Surface* sprite, const int x, const int y, const double speed, CarType type = CarType::civil);
 	Car();
-	~Car();
+	CarType GetType();
+	void Crash(SDL_Surface* crashedSprite);
 	void SetSpeed(double speed);
 	double GetSpeed();
 	void Update(const double delta, const double playerSpeed);
@@ -30,5 +40,6 @@ public:
 	void Left();
 	void Update();
 	double SteeringSpeed();
+	void Crash(SDL_Surface* crashedSprite);
 	MapTile CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map);
 };

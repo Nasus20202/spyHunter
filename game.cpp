@@ -7,6 +7,7 @@ Game::Game(const int screenWidth, const int screenHeight, const int mapWidth, co
 {
 	cars = NULL;
 	player = NULL;
+	sprites = NULL;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 	this->mapWidth = mapWidth;
@@ -44,21 +45,28 @@ void Game::RemoveCar(const int index)
 	cars = temp;
 }
 
-void Game::NewGame(Player* player)
+void Game::NewGame()
 {
 	srand(time(NULL));
+	state = State::playing;
 	delete[] cars;
 	cars = NULL;
 	carsAmount = 0;
-	delete this->player;
-	this->player = player;
+	NewPlayer();
 	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0, frame = 0, score = 0;
+	lives = START_LIVES;
 	NewMap();
 }
 
 Player* Game::GetPlayer()
 {
 	return player;
+}
+
+void Game::NewPlayer()
+{
+	delete player;
+	player = new Player(sprites[PLAYER_SPRITE], screenWidth / 2, screenHeight * 0.8, 100);
 }
 
 Car* Game::GetCar(const int index)
@@ -113,17 +121,32 @@ bool Game::CheckForCollision()
 {
 	Player* player = GetPlayer(); bool result = false;
 	for (int i = 0; i < GetCarsAmount(); i++) {
-		if (player->CheckForCollision(GetCar(i))) {
+		Car* car = GetCar(i);
+		if (player->CheckForCollision(car)) {
+			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
+				continue;
+			Crash();
+			car->Crash(sprites[CRASH_SPRITE]);
 			result = true;
-			printf("Car %d\n", i);
 		}
 	}
 	MapTile tile = player->CheckForCollisionWithMap(screenWidth, screenHeight, map);
 	if (tile == MapTile::grass) {
+		Crash();
 		result = true;
-		printf("Map\n");
 	}
 	return result;
+}
+
+void Game::Crash() {
+	lives--;
+	if (lives <= 0) {
+		//state = State::dead;
+	}
+	player->Crash(sprites[CRASH_SPRITE]);
+	Car* destroyed = new Car(sprites[1], player->GetX(), player->GetY(), 0, CarType::crashedPlayer);
+	AddCar(destroyed);
+	//NewPlayer();
 }
 
 void Game::UpdateMap()
@@ -169,6 +192,12 @@ Map* Game::GetMap()
 	return map;
 }
 
+void Game::SetSprites(SDL_Surface** sprites, const int amount)
+{
+	this->sprites = sprites;
+	spritesAmount = amount;
+}
+
 void Game::SetMap(Map* map)
 {
 	delete this->map;
@@ -193,6 +222,11 @@ int Game::GetMapHeight()
 int Game::GetScore()
 {
 	return score;
+}
+
+int Game::GetLives()
+{
+	return lives;
 }
 
 State Game::GetState()

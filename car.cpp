@@ -4,16 +4,25 @@
 
 #pragma region Car
 
-	Car::Car(SDL_Surface* sprite, int x, int y, double speed) : Sprite(sprite, x, y) {
+	Car::Car(SDL_Surface* sprite, const int x, const int y, const double speed, CarType type) : Sprite(sprite, x, y) {
 		this->speed = speed;
+		this->type = type;
 	}
 	Car::Car() : Sprite() {
 		this->speed = 0;
+		this->type = CarType::civil;
 	}
 
-	Car::~Car()
+	CarType Car::GetType()
 	{
-		
+		return type;
+	}
+
+	void Car::Crash(SDL_Surface* crashedSprite)
+	{
+		type = CarType::crashed;
+		SetSurface(crashedSprite);
+		SetSpeed(0);
 	}
 
 	void Car::SetSpeed(double speed)
@@ -70,6 +79,13 @@
 	{
 		double speed = this->GetSpeed();
 		return pow(speed, 0.5) * 0.1;
+	}
+
+	void Player::Crash(SDL_Surface* crashedSprite)
+	{
+		this->type = CarType::crashedPlayer;
+		SetSurface(crashedSprite);
+		SetSpeed(0);
 	}
 
 	MapTile Player::CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map)

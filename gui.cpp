@@ -93,12 +93,10 @@ void Gui::DrawSurface(SDL_Surface* sprite, const Point point)
 
 void Gui::NewGame()
 {
-	Player* player = new Player(sprites[0], (int) (SCREEN_WIDTH / 2), (int) (SCREEN_HEIGHT * 0.8));
-	game->NewGame(player);
-	game->SetState(State::playing);
+	game->NewGame();
 	// add temp cars
-	for (int i = 1; i <= 7; i++)
-		game->AddCar(new Car(sprites[i], (i + 1) * 100, 400, (i + 1) * 50));
+	for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
+		game->AddCar(new Car(sprites[i], i * 100, 400, i * 50));
 }
 
 // create and customize GUI
@@ -127,6 +125,7 @@ void Gui::Initialize(const int width, const int height, const char* title) {
 	charsetBig = LoadSurface(CHARSET_BIG);
 	charsetSmall = LoadSurface(CHARSET_SMALL);
 	LoadSprites();
+	game->SetSprites(sprites, spritesCount);
 	NewGame();
 	SDL_SetColorKey(charsetBig, true, 0x000000); SDL_SetColorKey(charsetSmall, true, 0x000000);
 	t1 = SDL_GetTicks();
@@ -174,17 +173,8 @@ void Gui::Frame() {
 	Player* player = game->GetPlayer();
 	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
-	// print game info
-	DrawRectangle(Point(3, 3), 100, 48, GetRGB(BLACK));
-	char info[128];
-	sprintf_s(info, "FPS: %.0lf", fps);
-	DrawText(info, Point(5, 5), false);
-	sprintf_s(info, "Time: %.1lfs", game->GetTime());
-	DrawText(info, Point(5, 17) , false);
-	sprintf_s(info, "Speed: %.0lf", game->GetPlayer()->GetSpeed());
-	DrawText(info, Point(5, 29), false);
-	sprintf_s(info, "Score: %d", game->GetScore());
-	DrawText(info, Point(5, 41), false);
+	// fps, time, score...
+	PrintGameInfo({3, 3});
 	
 	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -248,11 +238,31 @@ void Gui::Update() {
 				game->SetState(State::quit);
 			}
 		}
+		if (game->GetState() == State::quit)
+			return;
 		// handle pressed keys, this happens every game update
-		GameInput();
-		game->Update(updateTimer); // update game state
+		if (game->GetState() == State::playing) {
+			GameInput();
+			game->Update(updateTimer); // update game state
+		}
 		updateTimer = 0;
 	}
+}
+
+void Gui::PrintGameInfo(const Point point) {
+	const int x = point.x + 2, y = point.x + 2, dy = 12;
+	DrawRectangle(Point(point.x, point.y), 100, 5*dy, GetRGB(BLACK));
+	char info[128];
+	sprintf_s(info, "FPS: %.0lf", fps);
+	DrawText(info, Point(x, y), false);
+	sprintf_s(info, "Time: %.1lfs", game->GetTime());
+	DrawText(info, Point(x, y + dy), false);
+	sprintf_s(info, "Speed: %.0lf", game->GetPlayer()->GetSpeed());
+	DrawText(info, Point(x, y + 2 * dy), false);
+	sprintf_s(info, "Score: %d", game->GetScore());
+	DrawText(info, Point(x, y + 3 * dy), false);
+	sprintf_s(info, "Lives: %d", game->GetLives());
+	DrawText(info, Point(x, y + 4 * dy), false);
 }
 
 void Gui::PrintMap()

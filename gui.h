@@ -12,7 +12,8 @@
 #define FONT_SIZE_BIG 16
 #define FONT_SIZE_SMALL 8
 // files to be loaded as sprites
-#define ASSETS  "assets/player.bmp", "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp", \
+#define ASSETS  "assets/player.bmp", "assets/explosion.bmp", "assets/missle.bmp", \
+				 "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp", \
 				"assets/whitecar.bmp", "assets/yellowcar.bmp", "assets/pinkcar.bmp"
 // frames per second cap
 #define FPS_CAP 250
@@ -80,6 +81,7 @@ private:
 	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
 	void LoadSprite(const char* path);
+	void PrintGameInfo(const Point point);
 	void PrintMap();
 	void Update();
 	void Frame();
