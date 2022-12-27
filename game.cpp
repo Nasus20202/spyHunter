@@ -119,10 +119,10 @@ void Game::Update(const double delta)
 
 bool Game::CheckForCollision()
 {
-	Player* player = GetPlayer(); bool result = false;
+	bool result = false;
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
-		if (player->CheckForCollision(car)) {
+		if (GetPlayer()->CheckForCollision(car)) {
 			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
 				continue;
 			Crash();
@@ -130,7 +130,7 @@ bool Game::CheckForCollision()
 			result = true;
 		}
 	}
-	MapTile tile = player->CheckForCollisionWithMap(screenWidth, screenHeight, map);
+	MapTile tile = GetPlayer()->CheckForCollisionWithMap(screenWidth, screenHeight, map);
 	if (tile == MapTile::grass) {
 		Crash();
 		result = true;
@@ -146,7 +146,7 @@ void Game::Crash() {
 	player->Crash(sprites[CRASH_SPRITE]);
 	Car* destroyed = new Car(sprites[1], player->GetX(), player->GetY(), 0, CarType::crashedPlayer);
 	AddCar(destroyed);
-	//NewPlayer();
+	NewPlayer();
 }
 
 void Game::UpdateMap()
