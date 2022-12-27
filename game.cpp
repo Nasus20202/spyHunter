@@ -175,10 +175,10 @@ void Game::UpdateMap()
 	if (mapUpdate % GENERATION_DELAY == 0) {
 		const int quarter = mapWidth / 4, half = mapWidth / 2, threeQuarter = quarter * 3;
 		int rightDiff = Random(-1, 1), leftDiff = Random(-1, 1), islandDiff = Random(-1, 1);
-		if (rightRoadBorder >= half)
-			rightDiff = Random(-2, 1);
-		else if (rightRoadBorder >= threeQuarter)
+		if (rightRoadBorder >= threeQuarter)
 			rightDiff = Random(-3, 1);
+		else if (rightRoadBorder >= half)
+			rightDiff = Random(-2, 1);
 		if (leftRoadBorder <= half)
 			leftDiff = Random(-1, 2);
 		else if (leftRoadBorder <= quarter)
@@ -186,10 +186,10 @@ void Game::UpdateMap()
 		if (islandDiff < MIN_ISLAND_LENGHT)
 			islandDiff = Random(0, 1);
 		if (rightDiff < 0)
-			rightDiff = -3;
+			rightDiff = -1;
 		if (leftDiff > 0)
 			leftDiff = 1;
-		rightRoadBorder -= rightDiff;
+		rightRoadBorder += rightDiff;
 		leftRoadBorder += leftDiff;
 		trafficIsland += islandDiff;
 		if (rightRoadBorder < 0)
