@@ -53,7 +53,7 @@ void Game::NewGame()
 	cars = NULL;
 	carsAmount = 0;
 	NewPlayer();
-	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0, frame = 0, score = 0;
+	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0;
 	lives = START_LIVES;
 	NewMap();
 }
@@ -128,12 +128,13 @@ void Game::Update(const double delta)
 	double localDiff = playerSpeed * delta;
 	distanceDiff += localDiff;
 	distance += localDiff;
-	if (distanceDiff > TILE_HEIGHT) {
+	while (distanceDiff > TILE_HEIGHT) {
 		UpdateMap(); frame++;
 		distanceDiff -=TILE_HEIGHT;
 		score+=(1/(double)SCORE_DIVIDER);
 	}
 	CheckForCollision();
+	printf("%lf\n", localDiff);
 }
 
 bool Game::CheckForCollision()
