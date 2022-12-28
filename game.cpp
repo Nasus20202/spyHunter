@@ -128,9 +128,10 @@ void Game::Update(const double delta)
 	double localDiff = playerSpeed * delta;
 	distanceDiff += localDiff;
 	distance += localDiff;
-	while (distanceDiff > TILE_HEIGHT) {
+	const double tileHeight = screenHeight / (double)mapHeight;
+	while (distanceDiff > tileHeight) {
 		UpdateMap(); frame++;
-		distanceDiff -=TILE_HEIGHT;
+		distanceDiff -= tileHeight;
 		score+=(1/(double)SCORE_DIVIDER);
 	}
 	CheckForCollision();

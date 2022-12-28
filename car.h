@@ -3,8 +3,8 @@
 #include"./SDL2-2.0.10/include/SDL_main.h"
 #include "sprite.h"
 #include "map.h"
-#define ACCELERATION 2
-#define MAX_SPEED 3000
+#define ACCELERATION 0.6
+#define MAX_SPEED 1000
 
 enum class CarType : char {
 	player,
