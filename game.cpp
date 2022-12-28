@@ -72,6 +72,12 @@ void Game::NewPlayer()
 		player->SetX(x);
 		x+=20;
 	}
+	if (x != 0) {
+		int newX = x + 20;
+		player->SetX(newX);
+		if (player->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass)
+			player->SetX(newX - 20);
+	}
 	bool noCollisionWithCars = false;
 	while (noCollisionWithCars) {
 		for (int i = 0; i < carsAmount; i++)
@@ -172,63 +178,20 @@ void Game::UpdateMap()
 		}
 	}
 	// update generation values
-	if (mapUpdate % GENERATION_DELAY == 0) {
-		const int quarter = mapWidth / 4, half = mapWidth / 2, threeQuarter = quarter * 3;
-		int rightDiff = Random(-1, 1), leftDiff = Random(-1, 1), islandDiff = Random(-1, 1);
-		if (rightRoadBorder >= threeQuarter)
-			rightDiff = Random(-3, 1);
-		else if (rightRoadBorder >= half)
-			rightDiff = Random(-2, 1);
-		if (leftRoadBorder <= half)
-			leftDiff = Random(-1, 2);
-		else if (leftRoadBorder <= quarter)
-			leftDiff = Random(-1, 3);
-		if (islandDiff < MIN_ISLAND_LENGHT)
-			islandDiff = Random(0, 1);
-		if (rightDiff < 0)
-			rightDiff = -1;
-		if (leftDiff > 0)
-			leftDiff = 1;
-		rightRoadBorder += rightDiff;
-		leftRoadBorder += leftDiff;
-		trafficIsland += islandDiff;
-		if (rightRoadBorder < 0)
-			rightRoadBorder = 0;
-		if (leftRoadBorder > mapWidth - 1)
-			leftRoadBorder = mapWidth - 1;
-		int width = leftRoadBorder - rightRoadBorder - trafficIsland;
-		if (width < MIN_ROAD_WIDTH) {
-			int diff = MIN_ROAD_WIDTH - width;
-			if (leftRoadBorder < mapWidth / 2) {
-				leftRoadBorder += diff;
-			}
-			else if (rightRoadBorder >= mapWidth / 2) {
-				rightRoadBorder -= diff;
-			}
-			else {
-				leftRoadBorder += diff / 2;
-				rightRoadBorder -= diff / 2 + diff % 2;
-			}
-		}
-		printf("R: %d L: %d I: %d\n", rightRoadBorder, leftRoadBorder, trafficIsland);
-	}
-	
+	if (mapUpdate % GENERATION_DELAY == 0)
+		CalculateRoadBorders();
 	
 	// generate new map
 	const int roadWidth = leftRoadBorder - rightRoadBorder;
-	const int middle = rightRoadBorder + roadWidth / 2; bool hasTrafficIsland = false;
+	const int middle = rightRoadBorder + roadWidth / 2;
 	for (int x = 0; x < mapWidth; x++) {
 		if (x < rightRoadBorder || x > leftRoadBorder)
 			SetMapTile(x, 0, MapTile::grass);
 		else if (trafficIsland > 0 && x > middle - (trafficIsland / 2 + 1) && x < middle + (trafficIsland / 2 + 1)) {
 			SetMapTile(x, 0, MapTile::grass);
-			hasTrafficIsland = true; islandLength++;
 		}
 		else
 			SetMapTile(x, 0, MapTile::road);
-	}
-	if (!hasTrafficIsland) {
-		islandLength = islandLength > 0 ? 0 : islandLength - 1;
 	}
 	// add stripes at borded of the road
 	for (int x = 0; x < mapWidth; x++) {
@@ -238,6 +201,62 @@ void Game::UpdateMap()
 			SetMapTile(x, 0, MapTile::stripes);
 	}
 	mapUpdate++;
+}
+
+void Game::CalculateRoadBorders() {
+	int rightDiff = Random(-1, 1), leftDiff = Random(-1, 1), islandDiff = Random(-5, 1);
+	if (rightRoadBorder < mapWidth * 0.1)
+		rightDiff = Random(-1, 3);
+	else if (rightRoadBorder < mapWidth * 0.2)
+		rightDiff = Random(-1, 2);
+	if (leftRoadBorder > mapWidth * 0.9)
+		leftDiff = Random(-1, 2);
+	else if (leftRoadBorder > mapWidth * 0.8)
+		leftDiff = Random(-1, 3);
+	if (rightDiff > 0)
+		rightDiff = 1;
+	if (leftDiff > 0)
+		leftDiff = 1;
+	if (islandDiff < -1)
+		islandDiff = -1;
+	if (islandLength > 0 && islandLength < MIN_ISLAND_LENGHT)
+		islandDiff = Random(0, 1);
+	if (islandLength > -MIN_ISLAND_SPACE && islandLength < 0)
+		islandDiff = 0;
+	if (islandLength > MAX_ISLAND_LENGTH)
+		islandDiff = -1;
+	rightRoadBorder += rightDiff;
+	leftRoadBorder -= leftDiff;
+	trafficIsland += islandDiff;
+	if (rightRoadBorder < 0)
+		rightRoadBorder = 0;
+	if (leftRoadBorder > mapWidth - 1)
+		leftRoadBorder = mapWidth - 1;
+	if (trafficIsland < 0)
+		trafficIsland = 0;
+	if (trafficIsland > MAX_ISLAND_WIDTH)
+		trafficIsland = MAX_ISLAND_WIDTH;
+	int width = leftRoadBorder - rightRoadBorder - trafficIsland;
+	if (width < MIN_ROAD_WIDTH) {
+		int diff = MIN_ROAD_WIDTH - width;
+		if (leftRoadBorder < mapWidth / 2) {
+			leftRoadBorder += diff;
+		}
+		else if (rightRoadBorder >= mapWidth / 2) {
+			rightRoadBorder -= diff;
+		}
+		else {
+			leftRoadBorder += diff / 2;
+			rightRoadBorder -= diff / 2 + diff % 2;
+		}
+	}
+	if (trafficIsland > 0) {
+		if (islandLength < 0)
+			islandLength = 0;
+		islandLength++;
+	}
+	else
+		islandLength = islandLength > 0 ? -1 : islandLength - 1;
 }
 
 void Game::NewMap()

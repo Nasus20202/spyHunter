@@ -16,7 +16,10 @@
 #define START_ROAD_WIDTH 40
 #define MIN_ROAD_WIDTH 30
 #define GENERATION_DELAY 10
+#define MAX_ISLAND_WIDTH 10
 #define MIN_ISLAND_LENGHT 10
+#define MAX_ISLAND_LENGTH 100
+#define MIN_ISLAND_SPACE 200
 
 enum class State : char {
 	playing,
@@ -57,6 +60,7 @@ public:
 	void Crash();
 	
 	void UpdateMap();
+	void CalculateRoadBorders();
 	MapTile GetMapTile(const int x, const int y);
 	Map* GetMap();
 	void SetSprites(SDL_Surface** sprites, const int amount);
