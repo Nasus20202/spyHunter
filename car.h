@@ -22,6 +22,7 @@ public:
 	Car(SDL_Surface* sprite, const int x, const int y, const double speed, CarType type = CarType::civil);
 	Car();
 	CarType GetType();
+	void SetType(CarType type);
 	void Crash(SDL_Surface* crashedSprite);
 	void SetSpeed(double speed);
 	double GetSpeed();

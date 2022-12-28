@@ -136,7 +136,6 @@ void Game::Update(const double delta)
 	CheckForCollision();
 }
 
-
 bool Game::CheckForCollision()
 {
 	bool result = false;
@@ -159,11 +158,11 @@ bool Game::CheckForCollision()
 }
 
 void Game::Crash() {
+	player->Crash(sprites[CRASH_SPRITE]);
 	lives--;
 	if (lives <= 0) {
 		//state = State::dead;
 	}
-	player->Crash(sprites[CRASH_SPRITE]);
 	Car* destroyed = new Car(sprites[1], player->GetX(), player->GetY(), 0, CarType::crashedPlayer);
 	AddCar(destroyed);
 	NewPlayer();

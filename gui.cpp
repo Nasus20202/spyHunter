@@ -221,12 +221,6 @@ void Gui::Update() {
 		frames = 0;
 		fpsTimer -= 0.5;
 	}
-	// update screen
-	if (frameTimer >= frameTime) {
-		Frame();
-		frames++;
-		frameTimer = 0;
-	}
 	// update game state
 	if (updateTimer >= updateTime) {
 		// handle events
@@ -246,6 +240,12 @@ void Gui::Update() {
 			game->Update(updateTimer); // update game state
 		}
 		updateTimer = 0;
+	}
+	// update screen
+	if (frameTimer >= frameTime) {
+		Frame();
+		frames++;
+		frameTimer = 0;
 	}
 }
 

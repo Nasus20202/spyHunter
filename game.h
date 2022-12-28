@@ -4,22 +4,26 @@
 #include "sprite.h"
 #include "car.h"
 #include "map.h"
-#define MAP_WIDTH 100
-#define MAP_HEIGHT 200
-#define TILE_HEIGHT 10
+// map scaling factor
+#define SCALE 20
+#define MAP_WIDTH (10*SCALE)
+#define MAP_HEIGHT (20*SCALE)
+#define START_ROAD_WIDTH (4*SCALE)
+#define MIN_ROAD_WIDTH (4*SCALE)
+#define GENERATION_DELAY (1*SCALE)
+#define MAX_ISLAND_WIDTH (1*SCALE)
+#define MAX_ISLAND_LENGTH (10*SCALE)
+#define MIN_ISLAND_LENGHT (1*SCALE)
+#define MIN_ISLAND_SPACE (10*SCALE)
+#define TILE_HEIGHT 5
+
 #define SCORE_DIVIDER 100
 #define START_LIVES 3
+
 #define PLAYER_SPRITE 0
 #define CRASH_SPRITE 1
 #define MISSLE_SPRITE 2
 #define CARS_SPRITES_START 3
-#define START_ROAD_WIDTH 40
-#define MIN_ROAD_WIDTH 30
-#define GENERATION_DELAY 10
-#define MAX_ISLAND_WIDTH 10
-#define MIN_ISLAND_LENGHT 10
-#define MAX_ISLAND_LENGTH 100
-#define MIN_ISLAND_SPACE 200
 
 enum class State : char {
 	playing,

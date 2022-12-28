@@ -18,6 +18,11 @@
 		return type;
 	}
 
+	void Car::SetType(CarType type)
+	{
+		this->type = type;
+	}
+
 	void Car::Crash(SDL_Surface* crashedSprite)
 	{
 		type = CarType::crashed;
@@ -112,6 +117,8 @@
 
 	void Player::Update()
 	{
+		if (this->type == CarType::crashedPlayer)
+			return;
 		if (this->moveBuffer > 0) {
 			this->moveBuffer-= SteeringSpeed();
 			this->MoveX(SteeringSpeed());
