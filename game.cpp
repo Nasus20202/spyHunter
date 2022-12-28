@@ -134,7 +134,6 @@ void Game::Update(const double delta)
 		score+=(1/(double)SCORE_DIVIDER);
 	}
 	CheckForCollision();
-	printf("%lf\n", localDiff);
 }
 
 bool Game::CheckForCollision()

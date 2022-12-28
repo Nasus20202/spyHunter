@@ -271,8 +271,9 @@ void Gui::PrintMap()
 	const double blockWidth = width / (double)mapWidth, blockHeight = height / (double)mapHeight;
 	MapTile tile;
 	for (int y = 0; y < mapHeight; y++) {
-		int roadWidth = 0; bool drawRoad = false;
+		int roadWidth = 0;
 		for (int x = 0; x < mapWidth; x++) {
+			bool drawRoad = false;
 			tile = game->GetMapTile(x, y);
 			switch (tile) {
 			case MapTile::road:
@@ -285,7 +286,7 @@ void Gui::PrintMap()
 				drawRoad = true;
 				break;
 			}
-			if (drawRoad) {
+			if (drawRoad && roadWidth > 0) {
 				DrawRectangle({ (int)((x - roadWidth) * blockWidth), (int)(y * blockHeight) }, roadWidth * blockWidth, blockHeight + 1, GetRGB(FOREGROUND));
 				roadWidth = 0;
 				drawRoad = false;
