@@ -230,12 +230,27 @@ bool Game::CheckForCollision()
 			}
 		}
 	}
-	/*for (int i = 0; i < GetCarsAmount(); i++) {
+	// basic driving between the road edges
+	for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
+		const int x = car->GetX();
 		if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
-			car->Crash(sprites[CRASH_SPRITE]);
+			bool right = false; int oldX = car->GetX();
+			for (int x = car->GetX(); x < screenWidth - car->GetWidth() / 2; x+=20) {
+				car->SetX(x);
+				if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) != MapTile::grass) {
+					right = true; break;
+				}
+			}
+			car->SetX(oldX);
+			if (right) {
+				car->MoveX(1);
+			}
+			else {
+				car->MoveX(-1);
+			}
 		}
-	}*/
+	}
 	MapTile tile = GetPlayer()->CheckForCollisionWithMap(screenWidth, screenHeight, map);
 	if (tile == MapTile::grass) {
 		result = true;
