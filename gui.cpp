@@ -178,6 +178,11 @@ void Gui::Frame() {
 		Car* car = game->GetCar(i);
 		DrawSurface(car->GetSurface(), { car->GetX(), car->GetY() });
 	}
+	// draw missles
+	for (int i = 0; i < game->GetMisslesAmount(); i++) {
+		Car* missle = game->GetMissle(i);
+		DrawSurface(missle->GetSurface(), { missle->GetX(), missle->GetY() });
+	}
 	// draw player
 	Player* player = game->GetPlayer();
 	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
@@ -200,6 +205,8 @@ void Gui::Input(const SDL_Keycode key) {
 		NewGame(); break;
 	case SDLK_p:
 		Pause(); break;
+	case SDLK_SPACE:
+		game->Shoot(); break;
 	}
 }
 
@@ -214,8 +221,6 @@ void Gui::GameInput()
 		game->GetPlayer()->Accelerate();
 	if (currentKeyStates[SDL_SCANCODE_DOWN] || currentKeyStates[SDL_SCANCODE_S])
 		game->GetPlayer()->Brake();
-	if (currentKeyStates[SDL_SCANCODE_SPACE])
-		game->GetPlayer()->Shoot();
 }
 
 // update game state

@@ -56,7 +56,8 @@ void Game::NewGame()
 	missles = NULL;
 	misslesAmount = 0;
 	NewPlayer();
-	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0;
+	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0; 
+	shootCooldown = SHOOT_COOLDOWN; lastShot = 0;
 	lives = START_LIVES;
 	NewMap();
 }
@@ -125,9 +126,10 @@ void Game::Update(const double delta)
 	Player* player = this->GetPlayer();
 	player->Update();
 	const double playerSpeed = player->GetSpeed();
-	for (int i = 0; i < GetCarsAmount(); i++) {
+	for (int i = 0; i < GetCarsAmount(); i++)
 		GetCar(i)->Update(delta, playerSpeed);
-	}
+	for (int i = 0; i < misslesAmount; i++)
+		GetMissle(i)->Update(delta, playerSpeed);
 	double localDiff = playerSpeed * delta;
 	distanceDiff += localDiff;
 	distance += localDiff;
@@ -160,6 +162,18 @@ void Game::RemoveUnncessarySprites()
 bool Game::CheckForCollision()
 {
 	bool result = false;
+	for (int i = 0; i < GetMisslesAmount(); i++) {
+		for (int j = 0; j < GetCarsAmount(); j++) {
+			Car *car = GetCar(j), *missle = GetMissle(i);
+			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
+				continue;
+			if (missle->CheckForCollision(car) == true) {
+				missle->SetX(car->GetX()); missle->SetY(car->GetY());
+				missle->Crash(sprites[CRASH_SPRITE]);
+				car->Crash(sprites[CRASH_SPRITE]);
+			}
+		}
+	}
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
 		if (GetPlayer()->CheckForCollision(car)) {
@@ -179,12 +193,10 @@ bool Game::CheckForCollision()
 			// right push
 			else if (player->GetX() - player->GetWidth()/2  <= car->GetX() + car->GetWidth() * xSensitivity) {
 				car->SetX(player->GetX() + player->GetWidth()/2 + car->GetWidth()/2);
-				printf("move right\n");
 			}
 			// left push
 			else if (player->GetX() + player->GetWidth()/2 >= car->GetX() - car->GetWidth() * xSensitivity) {
 				car->SetX(player->GetX() - player->GetWidth() / 2 - car->GetWidth() / 2);
-				printf("move left\n");
 			}
 		}
 	}
@@ -357,12 +369,12 @@ int Game::GetMapHeight()
 	return map->GetHeight();
 }
 
-Sprite** Game::GetMissles()
+Car** Game::GetMissles()
 {
 	return missles;
 }
 
-Sprite* Game::GetMissle(const int index)
+Car* Game::GetMissle(const int index)
 {
 	if (index < 0 || index >= misslesAmount)
 		return NULL;
@@ -374,9 +386,9 @@ int Game::GetMisslesAmount()
 	return misslesAmount;
 }
 
-void Game::AddMissle(Sprite* missle)
+void Game::AddMissle(Car* missle)
 {
-	Sprite** temp = new Sprite * [misslesAmount + 1];
+	Car** temp = new Car * [misslesAmount + 1];
 	for (int i = 0; i < misslesAmount; i++)
 		temp[i] = missles[i];
 	temp[misslesAmount] = missle;
@@ -387,7 +399,7 @@ void Game::AddMissle(Sprite* missle)
 
 void Game::RemoveMissle(const int index)
 {
-	Sprite** temp = new Sprite * [carsAmount - 1];
+	Car** temp = new Car * [carsAmount - 1];
 	for (int i = 0; i < index; i++)
 		temp[i] = missles[i];
 	for (int i = index; i < misslesAmount - 1; i++)
@@ -399,7 +411,14 @@ void Game::RemoveMissle(const int index)
 
 void Game::Shoot()
 {
-	
+	if (worldTime - lastShot < shootCooldown)
+		return;
+	lastShot = worldTime;
+	AmmoType ammo = player->Shoot();
+	if (ammo == AmmoType::missle) {
+		Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED);
+		AddMissle(missle);
+	}
 }
 
 int Game::GetScore()

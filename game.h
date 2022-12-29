@@ -18,6 +18,8 @@
 
 #define SCORE_DIVIDER 100
 #define START_LIVES 3
+#define MISSLE_SPEED 500
+#define SHOOT_COOLDOWN 0.5
 
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 1000
@@ -39,10 +41,10 @@ enum class State : char {
 class Game {
 private:
 	Car* *cars;
-	Sprite* *missles;
+	Car* *missles;
 	Player* player;
 	int carsAmount = 0, misslesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
-	double worldTime = 0, distance = 0, distanceDiff = 0, score;
+	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN;
 	Map* map;
 	State state;
 	SDL_Surface** sprites; int spritesAmount;
@@ -60,10 +62,10 @@ public:
 	void AddCar(Car* car);
 	void RemoveCar(const int index);
 
-	Sprite* GetMissle(const int index);
-	Sprite** GetMissles();
+	Car* GetMissle(const int index);
+	Car** GetMissles();
 	int GetMisslesAmount();
-	void AddMissle(Sprite* missle);
+	void AddMissle(Car* missle);
 	void RemoveMissle(const int index);
 	
 	double GetTime();
