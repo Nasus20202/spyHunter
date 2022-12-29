@@ -18,6 +18,7 @@ Game::Game(const int screenWidth, const int screenHeight, const int mapWidth, co
 Game::~Game()
 {
 	delete[] cars;
+	delete[] missiles;
 	delete player;
 	delete map;
 }
@@ -52,9 +53,9 @@ void Game::NewGame()
 	delete[] cars;
 	cars = NULL;
 	carsAmount = 0;
-	delete[] missles;
-	missles = NULL;
-	misslesAmount = 0;
+	delete[] missiles;
+	missiles = NULL;
+	missilesAmount = 0;
 	NewPlayer();
 	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0; 
 	shootCooldown = SHOOT_COOLDOWN; lastShot = 0;
@@ -128,8 +129,8 @@ void Game::Update(const double delta)
 	const double playerSpeed = player->GetSpeed();
 	for (int i = 0; i < GetCarsAmount(); i++)
 		GetCar(i)->Update(delta, playerSpeed);
-	for (int i = 0; i < misslesAmount; i++)
-		GetMissle(i)->Update(delta, playerSpeed);
+	for (int i = 0; i < missilesAmount; i++)
+		GetMissile(i)->Update(delta, playerSpeed);
 	double localDiff = playerSpeed * delta;
 	distanceDiff += localDiff;
 	distance += localDiff;
@@ -155,6 +156,15 @@ void Game::RemoveUnncessarySprites()
 				done = false; break;
 			}
 		}
+	} done = false;
+	while (!done) {
+		done = true;
+		for (int i = 0; i < GetMissilesAmount(); i++) {
+			if (GetMissile(i)->GetY() > screenHeight + CLEAN_SPRITES_DISTANCE || GetMissile(i)->GetY() < -CLEAN_SPRITES_DISTANCE) {
+				RemoveMissile(i);
+				done = false; break;
+			}
+		}
 	}
 	
 }
@@ -162,14 +172,14 @@ void Game::RemoveUnncessarySprites()
 bool Game::CheckForCollision()
 {
 	bool result = false;
-	for (int i = 0; i < GetMisslesAmount(); i++) {
+	for (int i = 0; i < GetMissilesAmount(); i++) {
 		for (int j = 0; j < GetCarsAmount(); j++) {
-			Car *car = GetCar(j), *missle = GetMissle(i);
+			Car *car = GetCar(j), *missile = GetMissile(i);
 			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
 				continue;
-			if (missle->CheckForCollision(car) == true) {
-				missle->SetX(car->GetX()); missle->SetY(car->GetY());
-				missle->Crash(sprites[CRASH_SPRITE]);
+			if (missile->CheckForCollision(car) == true) {
+				missile->SetX(car->GetX()); missile->SetY(car->GetY());
+				missile->Crash(sprites[CRASH_SPRITE]);
 				car->Crash(sprites[CRASH_SPRITE]);
 			}
 		}
@@ -369,44 +379,44 @@ int Game::GetMapHeight()
 	return map->GetHeight();
 }
 
-Car** Game::GetMissles()
+Car** Game::GetMissiles()
 {
-	return missles;
+	return missiles;
 }
 
-Car* Game::GetMissle(const int index)
+Car* Game::GetMissile(const int index)
 {
-	if (index < 0 || index >= misslesAmount)
+	if (index < 0 || index >= missilesAmount)
 		return NULL;
-	return missles[index];
+	return missiles[index];
 }
 
-int Game::GetMisslesAmount()
+int Game::GetMissilesAmount()
 {
-	return misslesAmount;
+	return missilesAmount;
 }
 
-void Game::AddMissle(Car* missle)
+void Game::AddMissile(Car* missile)
 {
-	Car** temp = new Car * [misslesAmount + 1];
-	for (int i = 0; i < misslesAmount; i++)
-		temp[i] = missles[i];
-	temp[misslesAmount] = missle;
-	misslesAmount++;
-	delete[] missles;
-	missles = temp;
+	Car** temp = new Car * [missilesAmount + 1];
+	for (int i = 0; i < missilesAmount; i++)
+		temp[i] = missiles[i];
+	temp[missilesAmount] = missile;
+	missilesAmount++;
+	delete[] missiles;
+	missiles = temp;
 }
 
-void Game::RemoveMissle(const int index)
+void Game::RemoveMissile(const int index)
 {
-	Car** temp = new Car * [carsAmount - 1];
+	Car** temp = new Car * [missilesAmount - 1];
 	for (int i = 0; i < index; i++)
-		temp[i] = missles[i];
-	for (int i = index; i < misslesAmount - 1; i++)
-		temp[i] = missles[i + 1];
-	misslesAmount--;
-	delete[] missles;
-	missles = temp;
+		temp[i] = missiles[i];
+	for (int i = index; i < missilesAmount - 1; i++)
+		temp[i] = missiles[i + 1];
+	missilesAmount--;
+	delete[] missiles;
+	missiles = temp;
 }
 
 void Game::Shoot()
@@ -417,7 +427,7 @@ void Game::Shoot()
 	AmmoType ammo = player->Shoot();
 	if (ammo == AmmoType::missle) {
 		Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED);
-		AddMissle(missle);
+		AddMissile(missle);
 	}
 }
 

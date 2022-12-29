@@ -41,9 +41,9 @@ enum class State : char {
 class Game {
 private:
 	Car* *cars;
-	Car* *missles;
+	Car* *missiles;
 	Player* player;
-	int carsAmount = 0, misslesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
+	int carsAmount = 0, missilesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
 	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN;
 	Map* map;
 	State state;
@@ -62,11 +62,11 @@ public:
 	void AddCar(Car* car);
 	void RemoveCar(const int index);
 
-	Car* GetMissle(const int index);
-	Car** GetMissles();
-	int GetMisslesAmount();
-	void AddMissle(Car* missle);
-	void RemoveMissle(const int index);
+	Car* GetMissile(const int index);
+	Car** GetMissiles();
+	int GetMissilesAmount();
+	void AddMissile(Car* missle);
+	void RemoveMissile(const int index);
 	
 	double GetTime();
 	double GetDistance();

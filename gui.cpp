@@ -179,8 +179,8 @@ void Gui::Frame() {
 		DrawSurface(car->GetSurface(), { car->GetX(), car->GetY() });
 	}
 	// draw missles
-	for (int i = 0; i < game->GetMisslesAmount(); i++) {
-		Car* missle = game->GetMissle(i);
+	for (int i = 0; i < game->GetMissilesAmount(); i++) {
+		Car* missle = game->GetMissile(i);
 		DrawSurface(missle->GetSurface(), { missle->GetX(), missle->GetY() });
 	}
 	// draw player
