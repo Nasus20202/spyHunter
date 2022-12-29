@@ -239,7 +239,7 @@ bool Game::CheckForCollision()
 		MapTile tile = car->CheckForCollisionWithMap(screenWidth, screenHeight, map);
 		if (tile == MapTile::grass || tile == MapTile::stripes) {
 			bool right = false; int oldX = car->GetX();
-			for (int x = car->GetX(); x < screenWidth - car->GetWidth() / 2; x+=20) {
+			for (int x = car->GetX(); x < screenWidth - car->GetWidth() / 2; x += 20) {
 				car->SetX(x);
 				if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) != MapTile::grass) {
 					right = true; break;
@@ -250,6 +250,13 @@ bool Game::CheckForCollision()
 				car->MoveX(1);
 			else
 				car->MoveX(-1);
+			for (int j = 0; j < GetCarsAmount(); j++) {
+				if (i == j) continue;
+				Car* otherCar = GetCar(j);
+				if (car->CheckForCollision(otherCar) == true) {
+					car->SetX(oldX);
+				}
+			}
 		}
 	}
 	MapTile tile = GetPlayer()->CheckForCollisionWithMap(screenWidth, screenHeight, map);

@@ -16,7 +16,7 @@
 				 "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp", \
 				"assets/whitecar.bmp", "assets/yellowcar.bmp", "assets/pinkcar.bmp"
 // frames per second cap
-#define FPS_CAP 250
+#define FPS_CAP 100
 #define FRAME_TIME (1/((double)FPS_CAP))
 // game state refresh rate, including player input
 #define UPDATE_RATE 250

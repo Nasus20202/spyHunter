@@ -95,9 +95,9 @@ void Gui::NewGame()
 {
 	game->NewGame();
 	// add temp cars
-	/*for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
-		game->AddCar(new Car(sprites[i], i * 100, 400, i * 50));*/
-	game->AddCar(new Car(sprites[4], 600, 400, 100));
+	for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
+		game->AddCar(new Car(sprites[i], i * 100, 400, 200));
+	//game->AddCar(new Car(sprites[4], 600, 400, 100));
 }
 
 void Gui::Pause() {
