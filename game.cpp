@@ -126,6 +126,10 @@ void Game::Update(const double delta)
 	worldTime += delta;
 	Player* player = this->GetPlayer();
 	player->Update();
+	if (player->GetX() - player->GetWidth()/2 < 0)
+		player->SetX(player->GetWidth() / 2);
+	if (player->GetX() + player->GetWidth() / 2 > screenWidth)
+		player->SetX(screenWidth - player->GetWidth() / 2);
 	const double playerSpeed = player->GetSpeed();
 	for (int i = 0; i < GetCarsAmount(); i++)
 		GetCar(i)->Update(delta, playerSpeed);
@@ -135,13 +139,16 @@ void Game::Update(const double delta)
 	distanceDiff += localDiff;
 	distance += localDiff;
 	const double tileHeight = screenHeight / (double)mapHeight;
+	double scoreDiff = 0;
 	while (distanceDiff > tileHeight) {
 		UpdateMap(); frame++;
 		distanceDiff -= tileHeight;
-		score+=(1/(double)SCORE_DIVIDER);
+		scoreDiff +=(1/(double)SCORE_DIVIDER);
 	}
 	RemoveUnncessarySprites();
-	CheckForCollision();
+	if (!CheckForCollision()) {
+		score+=scoreDiff;
+	}
 }
 
 void Game::RemoveUnncessarySprites()
@@ -169,6 +176,7 @@ void Game::RemoveUnncessarySprites()
 	
 }
 
+// return true if player touches grass
 bool Game::CheckForCollision()
 {
 	bool result = false;
@@ -189,36 +197,47 @@ bool Game::CheckForCollision()
 		if (GetPlayer()->CheckForCollision(car)) {
 			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
 				continue;
-			const double ySensitivity = 0.45, xSensitivity = 0.25;
-			// bottom push
-			if (player->GetY() - player->GetHeight()/2 >= car->GetY() + car->GetHeight() * ySensitivity) {
-				if (car->GetSpeed() < player->GetSpeed()) {
-					car->SetSpeed(player->GetSpeed());
+			int speedDiff = car->GetSpeed() - GetPlayer()->GetSpeed();
+			if(speedDiff < 0)
+				speedDiff = -speedDiff;
+			if (speedDiff > SOFT_CRASH_SPEED) {
+				Crash();
+				car->Crash(sprites[CRASH_SPRITE]);
+			}
+			else {
+				const double ySensitivity = 0.45, xSensitivity = 0.25;
+				// bottom push
+				if (player->GetY() - player->GetHeight() / 2 >= car->GetY() + car->GetHeight() * ySensitivity) {
+					if (car->GetSpeed() < player->GetSpeed()) {
+						car->SetSpeed(player->GetSpeed());
+					}
 				}
-			}
-			// being pushed from bottom
-			else if (player->GetY() + player->GetHeight()/2 <= car->GetY() - car->GetHeight() * ySensitivity) {
-				player->SetSpeed(car->GetSpeed());
-			} 
-			// right push
-			else if (player->GetX() - player->GetWidth()/2  <= car->GetX() + car->GetWidth() * xSensitivity) {
-				car->SetX(player->GetX() + player->GetWidth()/2 + car->GetWidth()/2);
-			}
-			// left push
-			else if (player->GetX() + player->GetWidth()/2 >= car->GetX() - car->GetWidth() * xSensitivity) {
-				car->SetX(player->GetX() - player->GetWidth() / 2 - car->GetWidth() / 2);
+				// being pushed from bottom
+				else if (player->GetY() + player->GetHeight() / 2 <= car->GetY() - car->GetHeight() * ySensitivity) {
+					player->SetSpeed(car->GetSpeed());
+				}
+				// right push
+				else if (player->GetX() - player->GetWidth() / 2 <= car->GetX() + car->GetWidth() * xSensitivity) {
+					car->SetX(player->GetX() + player->GetWidth() / 2 + car->GetWidth() / 2);
+				}
+				// left push
+				else if (player->GetX() + player->GetWidth() / 2 >= car->GetX() - car->GetWidth() * xSensitivity) {
+					car->SetX(player->GetX() - player->GetWidth() / 2 - car->GetWidth() / 2);
+				}
+				if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
+					car->Crash(sprites[CRASH_SPRITE]);
+				}
 			}
 		}
 	}
-	for (int i = 0; i < GetCarsAmount(); i++) {
+	/*for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
 		if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
 			car->Crash(sprites[CRASH_SPRITE]);
 		}
-	}
+	}*/
 	MapTile tile = GetPlayer()->CheckForCollisionWithMap(screenWidth, screenHeight, map);
 	if (tile == MapTile::grass) {
-		Crash();
 		result = true;
 	}
 	return result;

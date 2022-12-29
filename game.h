@@ -20,6 +20,7 @@
 #define START_LIVES 3
 #define MISSLE_SPEED 500
 #define SHOOT_COOLDOWN 0.5
+#define SOFT_CRASH_SPEED 250
 
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 1000
