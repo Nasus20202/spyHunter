@@ -52,6 +52,9 @@ void Game::NewGame()
 	delete[] cars;
 	cars = NULL;
 	carsAmount = 0;
+	delete[] missles;
+	missles = NULL;
+	misslesAmount = 0;
 	NewPlayer();
 	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0;
 	lives = START_LIVES;
@@ -162,9 +165,30 @@ bool Game::CheckForCollision()
 		if (GetPlayer()->CheckForCollision(car)) {
 			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
 				continue;
-			Crash();
+			// bottom push
+			if (player->GetY() - player->GetHeight()/2 >= car->GetY() + car->GetHeight() / 4) {
+				if (car->GetSpeed() < player->GetSpeed()) {
+					car->SetSpeed(player->GetSpeed());
+				}
+			}
+			// being pushed from bottom
+			else if (player->GetY() + player->GetHeight()/2 <= car->GetY() - car->GetHeight() / 4) {
+				player->SetSpeed(car->GetSpeed());
+			} 
+			// right push
+			else if (player->GetX() + player->GetWidth()/2  <= car->GetX() - car->GetWidth() / 4) {
+				car->SetX(player->GetX() + player->GetWidth()/2 + car->GetWidth()/2);
+			}
+			// left push
+			else if (player->GetX() - player->GetWidth()/2 >= car->GetX() + car->GetWidth() / 4) {
+				car->SetX(player->GetX() - player->GetWidth() / 2 - car->GetWidth() / 2);
+			}
+		}
+	}
+	for (int i = 0; i < GetCarsAmount(); i++) {
+		Car* car = GetCar(i);
+		if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
 			car->Crash(sprites[CRASH_SPRITE]);
-			result = true;
 		}
 	}
 	MapTile tile = GetPlayer()->CheckForCollisionWithMap(screenWidth, screenHeight, map);
@@ -328,6 +352,51 @@ int Game::GetMapWidth()
 int Game::GetMapHeight()
 {
 	return map->GetHeight();
+}
+
+Sprite** Game::GetMissles()
+{
+	return missles;
+}
+
+Sprite* Game::GetMissle(const int index)
+{
+	if (index < 0 || index >= misslesAmount)
+		return NULL;
+	return missles[index];
+}
+
+int Game::GetMisslesAmount()
+{
+	return misslesAmount;
+}
+
+void Game::AddMissle(Sprite* missle)
+{
+	Sprite** temp = new Sprite * [misslesAmount + 1];
+	for (int i = 0; i < misslesAmount; i++)
+		temp[i] = missles[i];
+	temp[misslesAmount] = missle;
+	misslesAmount++;
+	delete[] missles;
+	missles = temp;
+}
+
+void Game::RemoveMissle(const int index)
+{
+	Sprite** temp = new Sprite * [carsAmount - 1];
+	for (int i = 0; i < index; i++)
+		temp[i] = missles[i];
+	for (int i = index; i < misslesAmount - 1; i++)
+		temp[i] = missles[i + 1];
+	misslesAmount--;
+	delete[] missles;
+	missles = temp;
+}
+
+void Game::Shoot()
+{
+	
 }
 
 int Game::GetScore()

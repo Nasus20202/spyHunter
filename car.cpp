@@ -45,6 +45,28 @@
 		this->MoveY((this->GetSpeed() - playerSpeed) * -delta);
 	}
 
+	MapTile Car::CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map)
+	{
+		const int mapWidth = map->GetWidth(), mapHeight = map->GetHeight();
+		const double blockWidth = screenWidth / (double)mapWidth, blockHeight = screenHeight / (double)mapHeight;
+		const int carX = this->GetX(), carY = this->GetY();
+		const int width = this->GetWidth(), height = this->GetHeight();
+		const int rightX = carX + width / 2, leftX = carX - width / 2, bottomY = carY + height / 2, topY = carY - height / 2;
+		const int rightBlock = rightX / blockWidth, leftBlock = leftX / blockWidth, bottomBlock = bottomY / blockHeight, topBlock = topY / blockHeight;
+		MapTile resultTile = MapTile::road;
+		for (int y = bottomBlock; y >= topBlock; y--)
+			for (int x = leftBlock; x <= rightBlock; x++) {
+				MapTile tile = map->GetMapTile(x, y);
+				if (tile == MapTile::grass) {
+					return tile; // return the first grass tile
+				}
+				else if (tile != MapTile::road && tile != MapTile::stripes) {
+					resultTile = tile; // return the last tile that is not road or stripes
+				}
+			}
+		return resultTile;
+	}
+
 #pragma endregion
 
 #pragma region Player 
@@ -53,9 +75,15 @@
 	{
 	}
 
-	void Player::Shoot()
+	AmmoType Player::Shoot()
 	{
-	
+		if (ammo > 0)
+		{
+			ammo--;
+			return ammoType;
+		}
+		ammoType = AmmoType::missle;
+		return ammoType;
 	}
 
 	void Player::Accelerate()
@@ -63,7 +91,7 @@
 		if ((this->GetSpeed() + speedBuffer) < MAX_SPEED)
 			this->speedBuffer += ACCELERATION;
 		if (this->GetSpeed() > MAX_SPEED)
-			this->speedBuffer = MAX_SPEED;
+			this->SetSpeed(MAX_SPEED);
 	}
 
 	void Player::Brake()
@@ -97,28 +125,6 @@
 		SetSpeed(0);
 	}
 
-	MapTile Player::CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map)
-	{
-		const int mapWidth = map->GetWidth(), mapHeight = map->GetHeight();
-		const double blockWidth = screenWidth / (double)mapWidth, blockHeight = screenHeight / (double)mapHeight;
-		const int carX = this->GetX(), carY = this->GetY();
-		const int width = this->GetWidth(), height = this->GetHeight();
-		const int rightX = carX + width / 2, leftX = carX - width / 2, bottomY = carY + height / 2, topY = carY - height / 2;
-		const int rightBlock = rightX / blockWidth, leftBlock = leftX / blockWidth, bottomBlock = bottomY / blockHeight, topBlock = topY / blockHeight;
-		MapTile resultTile = MapTile::road;
-		for (int y = bottomBlock; y >= topBlock; y--)
-			for (int x = leftBlock; x <= rightBlock; x++) {
-				MapTile tile = map->GetMapTile(x, y);
-				if (tile == MapTile::grass) {
-					return tile; // return the first grass tile
-				}
-				else if (tile != MapTile::road && tile != MapTile::stripes) {
-					resultTile = tile; // return the last tile that is not road or stripes
-				}
-			}
-		return resultTile;
-	}
-
 	void Player::Update()
 	{
 		if (this->type == CarType::crashedPlayer)
@@ -139,6 +145,26 @@
 			this->speedBuffer+= ACCELERATION;
 			this->SetSpeed(this->GetSpeed() - ACCELERATION);
 		}
+	}
+
+	int Player::GetAmmo()
+	{
+		return ammo;
+	}
+
+	void Player::SetAmmo(int ammo)
+	{
+		this->ammo = ammo;
+	}
+
+	AmmoType Player::GetAmmoType()
+	{
+		return ammoType;
+	}
+
+	void Player::SetAmmoType(AmmoType ammoType)
+	{
+		this->ammoType = ammoType;
 	}
 
 #pragma endregion

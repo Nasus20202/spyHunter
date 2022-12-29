@@ -39,8 +39,9 @@ enum class State : char {
 class Game {
 private:
 	Car* *cars;
+	Sprite* *missles;
 	Player* player;
-	int carsAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
+	int carsAmount = 0, misslesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
 	double worldTime = 0, distance = 0, distanceDiff = 0, score;
 	Map* map;
 	State state;
@@ -48,14 +49,23 @@ private:
 public:
 	Game(const int screenWidth, const int screenHeight, const int mapWidth = MAP_WIDTH, const int mapHeight = MAP_HEIGHT);
 	~Game();
-	void AddCar(Car* car);
-	void RemoveCar(const int index);
 	void NewGame();
+	
 	Player* GetPlayer();
 	void NewPlayer();
+	
 	Car* GetCar(const int index);
 	Car** GetCars();
 	int GetCarsAmount();
+	void AddCar(Car* car);
+	void RemoveCar(const int index);
+
+	Sprite* GetMissle(const int index);
+	Sprite** GetMissles();
+	int GetMisslesAmount();
+	void AddMissle(Sprite* missle);
+	void RemoveMissle(const int index);
+	
 	double GetTime();
 	double GetDistance();
 	int GetScore();
@@ -66,6 +76,7 @@ public:
 	void NewMap();
 	bool CheckForCollision();
 	void Crash();
+	void Shoot();
 	
 	void UpdateMap();
 	void CalculateRoadBorders();
