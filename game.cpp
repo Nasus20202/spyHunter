@@ -134,7 +134,24 @@ void Game::Update(const double delta)
 		distanceDiff -= tileHeight;
 		score+=(1/(double)SCORE_DIVIDER);
 	}
+	RemoveUnncessarySprites();
 	CheckForCollision();
+}
+
+void Game::RemoveUnncessarySprites()
+{
+	// remove cars that are out of the screen
+	bool done = false;
+	while (!done) {
+		done = true;
+		for (int i = 0; i < GetCarsAmount(); i++) {
+			if (GetCar(i)->GetY() > screenHeight + CLEAN_SPRITES_DISTANCE || GetCar(i)->GetY() < -CLEAN_SPRITES_DISTANCE) {
+				RemoveCar(i);
+				done = false; break;
+			}
+		}
+	}
+	
 }
 
 bool Game::CheckForCollision()

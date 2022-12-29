@@ -19,6 +19,10 @@
 #define SCORE_DIVIDER 100
 #define START_LIVES 3
 
+// max Y distance from screen before sprite is deleted
+#define CLEAN_SPRITES_DISTANCE 1000
+#define CAR_SPAWN_DISTANCE 200
+
 #define PLAYER_SPRITE 0
 #define CRASH_SPRITE 1
 #define MISSLE_SPRITE 2
@@ -58,6 +62,7 @@ public:
 	int GetLives();
 
 	void Update(const double delta);
+	void RemoveUnncessarySprites();
 	void NewMap();
 	bool CheckForCollision();
 	void Crash();

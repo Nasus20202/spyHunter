@@ -62,12 +62,16 @@
 	{
 		if ((this->GetSpeed() + speedBuffer) < MAX_SPEED)
 			this->speedBuffer += ACCELERATION;
+		if (this->GetSpeed() > MAX_SPEED)
+			this->speedBuffer = MAX_SPEED;
 	}
 
 	void Player::Brake()
 	{
 		if ((this->GetSpeed() + speedBuffer) > 0)
 			this->speedBuffer -= ACCELERATION;
+		if (this->GetSpeed() < 0)
+			this->SetSpeed(0);
 	}
 
 	void Player::Right()

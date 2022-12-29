@@ -99,6 +99,14 @@ void Gui::NewGame()
 		game->AddCar(new Car(sprites[i], i * 100, 400, i * 50));
 }
 
+void Gui::Pause() {
+	State state = game->GetState();
+	if (state == State::playing)
+		game->SetState(State::paused);
+	else if (state == State::paused)
+		game->SetState(State::playing);
+}
+
 // create and customize GUI
 void Gui::Initialize(const int width, const int height, const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -189,6 +197,8 @@ void Gui::Input(const SDL_Keycode key) {
 		game->SetState(State::quit); break;
 	case SDLK_n:
 		NewGame(); break;
+	case SDLK_p:
+		Pause(); break;
 	}
 }
 

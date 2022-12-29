@@ -77,6 +77,7 @@ private:
 	void DrawSurface(SDL_Surface * sprite, const Point point);
 
 	void NewGame();
+	void Pause();
 	
 	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
