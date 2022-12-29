@@ -233,6 +233,8 @@ bool Game::CheckForCollision()
 	// basic driving between the road edges
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
+		if (car->GetType() != CarType::civil && car->GetType() != CarType::enemy)
+			continue;
 		const int x = car->GetX();
 		MapTile tile = car->CheckForCollisionWithMap(screenWidth, screenHeight, map);
 		if (tile == MapTile::grass || tile == MapTile::stripes) {
