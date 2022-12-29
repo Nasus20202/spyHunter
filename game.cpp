@@ -165,23 +165,26 @@ bool Game::CheckForCollision()
 		if (GetPlayer()->CheckForCollision(car)) {
 			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
 				continue;
+			const double ySensitivity = 0.45, xSensitivity = 0.25;
 			// bottom push
-			if (player->GetY() - player->GetHeight()/2 >= car->GetY() + car->GetHeight() / 4) {
+			if (player->GetY() - player->GetHeight()/2 >= car->GetY() + car->GetHeight() * ySensitivity) {
 				if (car->GetSpeed() < player->GetSpeed()) {
 					car->SetSpeed(player->GetSpeed());
 				}
 			}
 			// being pushed from bottom
-			else if (player->GetY() + player->GetHeight()/2 <= car->GetY() - car->GetHeight() / 4) {
+			else if (player->GetY() + player->GetHeight()/2 <= car->GetY() - car->GetHeight() * ySensitivity) {
 				player->SetSpeed(car->GetSpeed());
 			} 
 			// right push
-			else if (player->GetX() + player->GetWidth()/2  <= car->GetX() - car->GetWidth() / 4) {
+			else if (player->GetX() - player->GetWidth()/2  <= car->GetX() + car->GetWidth() * xSensitivity) {
 				car->SetX(player->GetX() + player->GetWidth()/2 + car->GetWidth()/2);
+				printf("move right\n");
 			}
 			// left push
-			else if (player->GetX() - player->GetWidth()/2 >= car->GetX() + car->GetWidth() / 4) {
+			else if (player->GetX() + player->GetWidth()/2 >= car->GetX() - car->GetWidth() * xSensitivity) {
 				car->SetX(player->GetX() - player->GetWidth() / 2 - car->GetWidth() / 2);
+				printf("move left\n");
 			}
 		}
 	}
