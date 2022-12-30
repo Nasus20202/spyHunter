@@ -27,11 +27,14 @@
 #define CAR_SPAWN_DISTANCE 200
 #define PENALTY_TIME 5
 #define ENEMY_POINTS 10
+#define IMMORTAL_TIMER 5
+#define DIFFICULTY 200
 
 #define PLAYER_SPRITE 0
 #define CRASH_SPRITE 1
 #define MISSLE_SPRITE 2
-#define CARS_SPRITES_START 3
+#define BOMB_SPRITE 3
+#define CARS_SPRITES_START 4
 
 enum class State : char {
 	playing,

@@ -15,11 +15,14 @@ enum class CarType : char {
 	crashedPlayer,
 	missile,
 	enemyMissile,
+	bomb,
+	enemyBomb,
 	explosion
 };
 
 enum class AmmoType : char {
 	missle,
+	bomb
 };
 
 class Car : public Sprite {

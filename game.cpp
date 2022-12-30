@@ -150,6 +150,7 @@ void Game::Update(const double delta)
 	if (!CheckForCollision()) {
 		AddPoints(scoreDiff);
 	}
+	EnemyAction();
 }
 
 void Game::RemoveUnncessarySprites()
@@ -182,15 +183,25 @@ bool Game::CheckForCollision()
 {
 	bool result = false;
 	for (int i = 0; i < GetMissilesAmount(); i++) {
-		for (int j = 0; j < GetCarsAmount(); j++) {
-			Car *car = GetCar(j), *missile = GetMissile(i);
-			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil || missile->GetType() != CarType::missile)
-				continue;
-			if (missile->CheckForCollision(car) == true) {
-				missile->SetX(car->GetX()); missile->SetY(car->GetY());
+		Car* missile = GetMissile(i); CarType type = missile->GetType();
+		if (type == CarType::enemyMissile || type == CarType::enemyBomb) {
+			if (missile->CheckForCollision(player) == true) {
+				missile->SetX(player->GetX()); missile->SetY(player->GetY());
 				missile->Crash(sprites[CRASH_SPRITE], CarType::explosion);
-				CarDestroyed(car);
-				car->Crash(sprites[CRASH_SPRITE]);
+				Crash();
+			}
+		}
+		else {
+			for (int j = 0; j < GetCarsAmount(); j++) {
+				Car* car = GetCar(j);
+				if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil || missile->GetType() != CarType::missile)
+					continue;
+				if (missile->CheckForCollision(car) == true) {
+					missile->SetX(car->GetX()); missile->SetY(car->GetY());
+					missile->Crash(sprites[CRASH_SPRITE], CarType::explosion);
+					CarDestroyed(car);
+					car->Crash(sprites[CRASH_SPRITE]);
+				}
 			}
 		}
 	}
@@ -303,9 +314,10 @@ void Game::CarDestroyed(Car* car) {
 
 void Game::Crash() {
 	player->Crash(sprites[CRASH_SPRITE]);
-	lives--;
+	if(worldTime >= IMMORTAL_TIMER)
+		lives--;
 	if (lives <= 0) {
-		//state = State::dead;
+		state = State::dead;
 	}
 	Car* destroyed = new Car(sprites[1], player->GetX(), player->GetY(), 0, CarType::crashedPlayer);
 	AddCar(destroyed);
@@ -509,7 +521,20 @@ void Game::Shoot()
 }
 
 void Game::EnemyAction() {
-	
+	for (int i = 0; i < GetCarsAmount(); i++) {
+		Car* car = GetCar(i);
+		if(car->GetType() != CarType::enemy)
+			continue;
+		if (car->GetY() < 0 || car->GetY() > mapHeight)
+			continue;
+		if (car->GetY() < player->GetY() && car->GetX() + car->GetWidth() / 2 > player->GetX() - player->GetWidth() / 2 &&
+			car->GetX() - car->GetWidth() / 2 < player->GetX() + player->GetWidth() / 2) {
+			int placeBombProbability = Random(0, DIFFICULTY);
+			if (placeBombProbability == 0) {
+				AddMissile(new Car(sprites[BOMB_SPRITE], car->GetX(), car->GetY() + car->GetHeight() / 2, 0, CarType::enemyBomb));
+			}
+		}
+	}
 }
 
 int Game::GetScore()

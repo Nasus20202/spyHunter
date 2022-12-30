@@ -185,7 +185,8 @@ void Gui::Frame() {
 	}
 	// draw player
 	Player* player = game->GetPlayer();
-	DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
+	if(game->GetState() != State::dead)
+		DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
 	// fps, time, score...
 	PrintGameInfo({3, 3});
