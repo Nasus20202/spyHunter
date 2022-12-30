@@ -31,6 +31,10 @@
 #define SPEED_DIFFERENCE 200
 #define PENALTY_TIME 5
 #define ENEMY_POINTS 10
+#define START_SPEED 150
+#define MIN_CAR_SPEED 100
+#define MAX_CAR_SPEED 900
+#define CAR_SPAWN_RATE 500
 
 
 #define PLAYER_SPRITE 0
@@ -38,13 +42,15 @@
 #define MISSLE_SPRITE 2
 #define BOMB_SPRITE 3
 #define CARS_SPRITES_START 4
+#define ENEMY_SPRITES_START 8
 
 enum class State : char {
 	playing,
 	paused,
 	dead,
 	menu,
-	quit
+	quit,
+	finished
 };
 
 class Game {
@@ -81,7 +87,7 @@ public:
 	double GetDistance();
 	int GetScore();
 	int GetLives();
-	void PushCar(Car* pusingCar, Car* pushedCar);
+	void PushCar(Car* pusingCar, Car* pushedCar, bool destroyCars = false);
 
 	void Update(const double delta);
 	void RemoveUnncessarySprites();
@@ -91,7 +97,7 @@ public:
 	void Shoot();
 	void EnemyAction();
 	void AddPoints(const double points);
-	void CarDestroyed(Car* car);
+	void CarDestroyed(Car* car, CarType type = CarType::crashed);
 	
 	void UpdateMap();
 	void CalculateRoadBorders();
@@ -102,10 +108,11 @@ public:
 	void SetMapTile(const int x, const int y, const MapTile value);
 	int GetMapWidth();
 	int GetMapHeight();
+	void GenerateNewCar(bool onScreen = false);
 
 	State GetState();
 	void SetState(State state);
 
-	int Random(const int from, const int to);
+	int Random(int from, int to);
 };
 

@@ -95,8 +95,8 @@ void Gui::NewGame()
 {
 	game->NewGame();
 	// add temp cars
-	for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
-		game->AddCar(new Car(sprites[i], i * 90, 400, 300, i % 2 == 0 ? CarType::civil : CarType::enemy));
+	/*for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
+		game->AddCar(new Car(sprites[i], i * 90, 400, 300, i % 2 == 0 ? CarType::civil : CarType::enemy));*/
 	//game->AddCar(new Car(sprites[4], 600, 400, 100));
 }
 
@@ -188,7 +188,7 @@ void Gui::Frame() {
 	if(game->GetState() != State::dead)
 		DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
-	// fps, time, score...
+	// fps, time, score, game state...
 	PrintGameInfo({3, 3});
 	
 	// render
@@ -280,6 +280,16 @@ void Gui::PrintGameInfo(const Point point) {
 	DrawText(info, Point(x, y + 3 * dy), false);
 	sprintf_s(info, "Lives: %d", game->GetLives());
 	DrawText(info, Point(x, y + 4 * dy), false);
+	// game status text
+	switch (game->GetState()) {
+	case State::paused:
+		sprintf_s(info, "       PAUZA"); break;
+	case State::dead:
+		sprintf_s(info, "KONIEC GRY (wynik %d)", game->GetScore()); break;
+	default:
+		sprintf_s(info, ""); break;
+	}
+	DrawText(info, Point(width/2 - 150, height/2));
 }
 
 void Gui::PrintMap()

@@ -13,8 +13,8 @@
 #define FONT_SIZE_SMALL 8
 // files to be loaded as sprites
 #define ASSETS  "assets/player.bmp", "assets/explosion.bmp", "assets/missle.bmp", "assets/bomb.bmp", \
-				 "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/redcar.bmp", \
-				"assets/whitecar.bmp", "assets/yellowcar.bmp", "assets/pinkcar.bmp"
+				 "assets/blackcar.bmp", "assets/bluecar.bmp", "assets/greencar.bmp", "assets/whitecar.bmp", \
+				 "assets/redcar.bmp","assets/yellowcar.bmp", "assets/pinkcar.bmp"
 // frames per second cap
 #define FPS_CAP 250
 #define FRAME_TIME (1/((double)FPS_CAP))
