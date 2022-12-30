@@ -21,6 +21,9 @@
 #define MISSLE_SPEED 500
 #define SHOOT_COOLDOWN 0.5
 #define SOFT_CRASH_SPEED 250
+#define IMMORTAL_TIMER 5
+#define DIFFICULTY 200
+#define ENEMY_MISSILE_SPEED 125
 
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 1000
@@ -28,8 +31,7 @@
 #define SPEED_DIFFERENCE 200
 #define PENALTY_TIME 5
 #define ENEMY_POINTS 10
-#define IMMORTAL_TIMER 5
-#define DIFFICULTY 200
+
 
 #define PLAYER_SPRITE 0
 #define CRASH_SPRITE 1

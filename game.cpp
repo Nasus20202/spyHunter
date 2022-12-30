@@ -150,6 +150,16 @@ void Game::Update(const double delta)
 	if (!CheckForCollision()) {
 		AddPoints(scoreDiff);
 	}
+	else {
+		double speed = player->GetSpeed();
+		// grass speed penalty
+		if (speed > MAX_SPEED/2) {
+			player->SetSpeed(speed - 1.5*ACCELERATION);
+		}
+		int shaking = Random(-1, 1);
+		if (player->GetX() - player->GetWidth() / 2 - shaking >= 0 && player->GetX() + player->GetWidth() / 2 + shaking <= screenWidth)
+			player->MoveX(shaking);
+	}
 	EnemyAction();
 }
 
@@ -537,7 +547,7 @@ void Game::EnemyAction() {
 			else if (car->GetY() > player->GetY()) {
 				int shootProbability = Random(0, DIFFICULTY);
 				if (shootProbability == 0) {
-					AddMissile(new Car(sprites[MISSLE_SPRITE], car->GetX(), car->GetY() + car->GetHeight() / 2, car->GetSpeed() + MISSLE_SPEED/4, CarType::enemyMissile));
+					AddMissile(new Car(sprites[MISSLE_SPRITE], car->GetX(), car->GetY() + car->GetHeight() / 2, car->GetSpeed() + ENEMY_MISSILE_SPEED, CarType::enemyMissile));
 				}
 			}
 		}
