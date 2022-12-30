@@ -1,7 +1,9 @@
 #define _USE_MATH_DEFINES
-#include<math.h>
-#include<stdio.h>
-#include<string.h>
+#include<cmath>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
+#include<ctime>
 #include "gui.h"
 #include "game.h"
 #include "car.h"
@@ -94,10 +96,6 @@ void Gui::DrawSurface(SDL_Surface* sprite, const Point point)
 void Gui::NewGame()
 {
 	game->NewGame();
-	// add temp cars
-	/*for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
-		game->AddCar(new Car(sprites[i], i * 90, 400, 300, i % 2 == 0 ? CarType::civil : CarType::enemy));*/
-	//game->AddCar(new Car(sprites[4], 600, 400, 100));
 }
 
 void Gui::Pause() {
@@ -135,6 +133,7 @@ void Gui::Initialize(const int width, const int height, const char* title) {
 	charsetSmall = LoadSurface(CHARSET_SMALL);
 	LoadSprites();
 	game->SetSprites(sprites, spritesCount);
+	srand(time(NULL));
 	NewGame();
 	SDL_SetColorKey(charsetBig, true, 0x000000); SDL_SetColorKey(charsetSmall, true, 0x000000);
 	t1 = SDL_GetTicks();
@@ -173,15 +172,15 @@ void Gui::Frame() {
 	// draw road
 	PrintMap();
 
-	// draw cars
-	for (int i = 0; i < game->GetCarsAmount(); i++) {
-		Car* car = game->GetCar(i);
-		DrawSurface(car->GetSurface(), { car->GetX(), car->GetY() });
-	}
 	// draw missles
 	for (int i = 0; i < game->GetMissilesAmount(); i++) {
 		Car* missle = game->GetMissile(i);
 		DrawSurface(missle->GetSurface(), { missle->GetX(), missle->GetY() });
+	}
+	// draw cars
+	for (int i = 0; i < game->GetCarsAmount(); i++) {
+		Car* car = game->GetCar(i);
+		DrawSurface(car->GetSurface(), { car->GetX(), car->GetY() });
 	}
 	// draw player
 	Player* player = game->GetPlayer();

@@ -48,7 +48,6 @@ void Game::RemoveCar(const int index)
 
 void Game::NewGame()
 {
-	srand(time(NULL));
 	state = State::playing;
 	delete[] cars;
 	cars = NULL;
@@ -315,7 +314,8 @@ bool Game::CheckForCollision()
 		for (int j = 0; j < GetCarsAmount(); j++) {
 			if (i == j) continue;
 			Car* otherCar = GetCar(j);
-			PushCar(car, otherCar);
+			if(car->CheckForCollision(otherCar))
+				PushCar(car, otherCar);
 		}
 	}
 	return result;
