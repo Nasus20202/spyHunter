@@ -202,6 +202,8 @@ void Game::Update(const double delta)
 		if (player->GetX() - player->GetWidth() / 2 - shaking >= 0 && player->GetX() + player->GetWidth() / 2 + shaking <= screenWidth)
 			player->MoveX(shaking);
 	}
+	if (Random(0, CAR_SPAWN_RATE) == 0)
+		GenerateNewCar();
 	EnemyAction();
 	
 }
@@ -325,7 +327,7 @@ void Game::PushCar(Car* pushingCar, Car* pushedCar, bool destroyCars) {
 	if ((pushingCar->GetType() != CarType::player && pushingCar->GetType() != CarType::civil && pushingCar->GetType() != CarType::enemy) ||
 		(pushedCar->GetType() != CarType::player && pushedCar->GetType() != CarType::civil && pushedCar->GetType() != CarType::enemy))
 		return;
-	const double ySensitivity = 0.45, xSensitivity = 0.25;
+	const double ySensitivity = 0.4, xSensitivity = 0.25;
 	// bottom push
 	if (pushingCar->GetY() - pushingCar->GetHeight() / 2 >= pushedCar->GetY() + pushedCar->GetHeight() * ySensitivity) {
 		int maxSpeed = pushingCar->GetSpeed();
