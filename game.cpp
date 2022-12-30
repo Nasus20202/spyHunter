@@ -255,13 +255,21 @@ void Game::PushCar(Car* pushingCar, Car* pushedCar) {
 	const double ySensitivity = 0.45, xSensitivity = 0.25;
 	// bottom push
 	if (pushingCar->GetY() - pushingCar->GetHeight() / 2 >= pushedCar->GetY() + pushedCar->GetHeight() * ySensitivity) {
-		if (pushedCar->GetSpeed() < pushingCar->GetSpeed()) {
-			pushedCar->SetSpeed(pushingCar->GetSpeed());
+		int maxSpeed = pushingCar->GetSpeed();
+		if (pushedCar->GetSpeed() > maxSpeed) {
+			maxSpeed = pushedCar->GetSpeed();
 		}
+		pushingCar->SetSpeed(maxSpeed);
+		pushedCar->SetSpeed(maxSpeed);
 	}
 	// being pushed from bottom
 	else if (pushingCar->GetY() + pushingCar->GetHeight() / 2 <= pushedCar->GetY() - pushedCar->GetHeight() * ySensitivity) {
-		pushingCar->SetSpeed(pushedCar->GetSpeed());
+		int maxSpeed = pushingCar->GetSpeed();
+		if (pushedCar->GetSpeed() > maxSpeed) {
+			maxSpeed = pushedCar->GetSpeed();
+		}
+		pushingCar->SetSpeed(maxSpeed);
+		pushedCar->SetSpeed(maxSpeed);
 	}
 	// right push
 	else if (pushingCar->GetX() - pushingCar->GetWidth() / 2 <= pushedCar->GetX() + pushedCar->GetWidth() * xSensitivity) {
