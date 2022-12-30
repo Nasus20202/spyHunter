@@ -60,6 +60,7 @@ void Game::NewGame()
 	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0; 
 	shootCooldown = SHOOT_COOLDOWN; lastShot = 0;
 	lives = START_LIVES;
+	penaltyTime = -1;
 	NewMap();
 }
 
@@ -147,7 +148,7 @@ void Game::Update(const double delta)
 	}
 	RemoveUnncessarySprites();
 	if (!CheckForCollision()) {
-		score+=scoreDiff;
+		AddPoints(scoreDiff);
 	}
 }
 
@@ -183,11 +184,12 @@ bool Game::CheckForCollision()
 	for (int i = 0; i < GetMissilesAmount(); i++) {
 		for (int j = 0; j < GetCarsAmount(); j++) {
 			Car *car = GetCar(j), *missile = GetMissile(i);
-			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil)
+			if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil || missile->GetType() != CarType::missile)
 				continue;
 			if (missile->CheckForCollision(car) == true) {
 				missile->SetX(car->GetX()); missile->SetY(car->GetY());
-				missile->Crash(sprites[CRASH_SPRITE]);
+				missile->Crash(sprites[CRASH_SPRITE], CarType::explosion);
+				CarDestroyed(car);
 				car->Crash(sprites[CRASH_SPRITE]);
 			}
 		}
@@ -202,31 +204,11 @@ bool Game::CheckForCollision()
 				speedDiff = -speedDiff;
 			if (speedDiff > SOFT_CRASH_SPEED) {
 				Crash();
+				CarDestroyed(car);
 				car->Crash(sprites[CRASH_SPRITE]);
 			}
 			else {
-				const double ySensitivity = 0.45, xSensitivity = 0.25;
-				// bottom push
-				if (player->GetY() - player->GetHeight() / 2 >= car->GetY() + car->GetHeight() * ySensitivity) {
-					if (car->GetSpeed() < player->GetSpeed()) {
-						car->SetSpeed(player->GetSpeed());
-					}
-				}
-				// being pushed from bottom
-				else if (player->GetY() + player->GetHeight() / 2 <= car->GetY() - car->GetHeight() * ySensitivity) {
-					player->SetSpeed(car->GetSpeed());
-				}
-				// right push
-				else if (player->GetX() - player->GetWidth() / 2 <= car->GetX() + car->GetWidth() * xSensitivity) {
-					car->SetX(player->GetX() + player->GetWidth() / 2 + car->GetWidth() / 2);
-				}
-				// left push
-				else if (player->GetX() + player->GetWidth() / 2 >= car->GetX() - car->GetWidth() * xSensitivity) {
-					car->SetX(player->GetX() - player->GetWidth() / 2 - car->GetWidth() / 2);
-				}
-				if (car->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
-					car->Crash(sprites[CRASH_SPRITE]);
-				}
+				PushCar(player, car);
 			}
 		}
 	}
@@ -264,6 +246,55 @@ bool Game::CheckForCollision()
 		result = true;
 	}
 	return result;
+}
+
+void Game::PushCar(Car* pushingCar, Car* pushedCar) {
+	if ((pushingCar->GetType() != CarType::player && pushingCar->GetType() != CarType::civil && pushingCar->GetType() != CarType::enemy) ||
+		(pushedCar->GetType() != CarType::player && pushedCar->GetType() != CarType::civil && pushedCar->GetType() != CarType::enemy))
+		return;
+	const double ySensitivity = 0.45, xSensitivity = 0.25;
+	// bottom push
+	if (pushingCar->GetY() - pushingCar->GetHeight() / 2 >= pushedCar->GetY() + pushedCar->GetHeight() * ySensitivity) {
+		if (pushedCar->GetSpeed() < pushingCar->GetSpeed()) {
+			pushedCar->SetSpeed(pushingCar->GetSpeed());
+		}
+	}
+	// being pushed from bottom
+	else if (pushingCar->GetY() + pushingCar->GetHeight() / 2 <= pushedCar->GetY() - pushedCar->GetHeight() * ySensitivity) {
+		pushingCar->SetSpeed(pushedCar->GetSpeed());
+	}
+	// right push
+	else if (pushingCar->GetX() - pushingCar->GetWidth() / 2 <= pushedCar->GetX() + pushedCar->GetWidth() * xSensitivity) {
+		pushedCar->SetX(pushingCar->GetX() + pushingCar->GetWidth() / 2 + pushedCar->GetWidth() / 2);
+	}
+	// left push
+	else if (pushingCar->GetX() + pushingCar->GetWidth() / 2 >= pushedCar->GetX() - pushedCar->GetWidth() * xSensitivity) {
+		pushedCar->SetX(pushingCar->GetX() - pushingCar->GetWidth() / 2 - pushedCar->GetWidth() / 2);
+	}
+	if (pushedCar->CheckForCollisionWithMap(screenWidth, screenHeight, map) == MapTile::grass) {
+		CarDestroyed(pushedCar);
+		pushedCar->Crash(sprites[CRASH_SPRITE]);
+	}
+	bool done = false;
+	while (!done) {
+		done = true;
+		for (int i = 0; i < GetCarsAmount(); i++) {
+			Car* secondPushedCar = GetCar(i);
+			CarType type = secondPushedCar->GetType();
+			if (secondPushedCar == pushingCar || secondPushedCar == pushedCar || (type != CarType::player && type != CarType::civil && type != CarType::enemy))
+				continue;
+			if (pushedCar->CheckForCollision(secondPushedCar) == true) {
+				PushCar(pushedCar, secondPushedCar); done = false; break;
+			}
+		}
+	}
+}
+
+void Game::CarDestroyed(Car* car) {
+	if (car->GetType() == CarType::enemy)
+		AddPoints(ENEMY_POINTS);
+	else if (car->GetType() == CarType::civil)
+		penaltyTime = worldTime + PENALTY_TIME;
 }
 
 void Game::Crash() {
@@ -468,14 +499,24 @@ void Game::Shoot()
 	lastShot = worldTime;
 	AmmoType ammo = player->Shoot();
 	if (ammo == AmmoType::missle) {
-		Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED);
+		Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED, CarType::missile);
 		AddMissile(missle);
 	}
+}
+
+void Game::EnemyAction() {
+	
 }
 
 int Game::GetScore()
 {
 	return score;
+}
+
+void Game::AddPoints(const double points)
+{
+	if(worldTime > penaltyTime)
+		score += points;
 }
 
 int Game::GetLives()

@@ -23,9 +23,9 @@
 		this->type = type;
 	}
 
-	void Car::Crash(SDL_Surface* crashedSprite)
+	void Car::Crash(SDL_Surface* crashedSprite, CarType type)
 	{
-		type = CarType::crashed;
+		this->type = type;
 		SetSurface(crashedSprite);
 		SetSpeed(0);
 	}
@@ -115,7 +115,7 @@
 	double Player::SteeringSpeed()
 	{
 		double speed = this->GetSpeed();
-		return pow(speed, 0.5) * 0.1;
+		return pow(speed, 0.5) * STEERING_FORCE;
 	}
 
 	void Player::Crash(SDL_Surface* crashedSprite)

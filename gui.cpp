@@ -95,8 +95,8 @@ void Gui::NewGame()
 {
 	game->NewGame();
 	// add temp cars
-	for (int i = CARS_SPRITES_START; i <= 6 + CARS_SPRITES_START; i++)
-		game->AddCar(new Car(sprites[i], i * 100, 400, 200));
+	for (int i = 6; i <= 6 + CARS_SPRITES_START; i++)
+		game->AddCar(new Car(sprites[i], i * 80, 400, 100, i % 2 == 0 ? CarType::civil : CarType::enemy));
 	//game->AddCar(new Car(sprites[4], 600, 400, 100));
 }
 

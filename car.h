@@ -3,7 +3,8 @@
 #include"./SDL2-2.0.10/include/SDL_main.h"
 #include "sprite.h"
 #include "map.h"
-#define ACCELERATION 0.6
+#define ACCELERATION 1.5
+#define STEERING_FORCE 0.25
 #define MAX_SPEED 1000
 
 enum class CarType : char {
@@ -11,7 +12,10 @@ enum class CarType : char {
 	civil,
 	enemy,
 	crashed,
-	crashedPlayer
+	crashedPlayer,
+	missile,
+	enemyMissile,
+	explosion
 };
 
 enum class AmmoType : char {
@@ -27,7 +31,7 @@ public:
 	Car();
 	CarType GetType();
 	void SetType(CarType type);
-	void Crash(SDL_Surface* crashedSprite);
+	void Crash(SDL_Surface* crashedSprite, CarType type = CarType::crashed);
 	void SetSpeed(double speed);
 	double GetSpeed();
 	void Update(const double delta, const double playerSpeed);

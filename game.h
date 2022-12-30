@@ -25,6 +25,8 @@
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 1000
 #define CAR_SPAWN_DISTANCE 200
+#define PENALTY_TIME 5
+#define ENEMY_POINTS 10
 
 #define PLAYER_SPRITE 0
 #define CRASH_SPRITE 1
@@ -45,7 +47,7 @@ private:
 	Car* *missiles;
 	Player* player;
 	int carsAmount = 0, missilesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
-	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN;
+	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN, penaltyTime;
 	Map* map;
 	State state;
 	SDL_Surface** sprites; int spritesAmount;
@@ -73,6 +75,7 @@ public:
 	double GetDistance();
 	int GetScore();
 	int GetLives();
+	void PushCar(Car* pusingCar, Car* pushedCar);
 
 	void Update(const double delta);
 	void RemoveUnncessarySprites();
@@ -80,6 +83,9 @@ public:
 	bool CheckForCollision();
 	void Crash();
 	void Shoot();
+	void EnemyAction();
+	void AddPoints(const double points);
+	void CarDestroyed(Car* car);
 	
 	void UpdateMap();
 	void CalculateRoadBorders();
