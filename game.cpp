@@ -275,17 +275,13 @@ void Game::PushCar(Car* pushingCar, Car* pushedCar) {
 		CarDestroyed(pushedCar);
 		pushedCar->Crash(sprites[CRASH_SPRITE]);
 	}
-	bool done = false;
-	while (!done) {
-		done = true;
-		for (int i = 0; i < GetCarsAmount(); i++) {
-			Car* secondPushedCar = GetCar(i);
-			CarType type = secondPushedCar->GetType();
-			if (secondPushedCar == pushingCar || secondPushedCar == pushedCar || (type != CarType::player && type != CarType::civil && type != CarType::enemy))
-				continue;
-			if (pushedCar->CheckForCollision(secondPushedCar) == true) {
-				PushCar(pushedCar, secondPushedCar); done = false; break;
-			}
+	for (int i = 0; i < GetCarsAmount(); i++) {
+		Car* secondPushedCar = GetCar(i);
+		CarType type = secondPushedCar->GetType();
+		if (secondPushedCar == pushingCar || secondPushedCar == pushedCar || (type != CarType::player && type != CarType::civil && type != CarType::enemy))
+			continue;
+		if (pushedCar->CheckForCollision(secondPushedCar) == true) {
+			PushCar(pushedCar, secondPushedCar);
 		}
 	}
 }
