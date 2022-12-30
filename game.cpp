@@ -525,13 +525,20 @@ void Game::EnemyAction() {
 		Car* car = GetCar(i);
 		if(car->GetType() != CarType::enemy)
 			continue;
-		if (car->GetY() < 0 || car->GetY() > mapHeight)
-			continue;
-		if (car->GetY() < player->GetY() && car->GetX() + car->GetWidth() / 2 > player->GetX() - player->GetWidth() / 2 &&
-			car->GetX() - car->GetWidth() / 2 < player->GetX() + player->GetWidth() / 2) {
-			int placeBombProbability = Random(0, DIFFICULTY);
-			if (placeBombProbability == 0) {
-				AddMissile(new Car(sprites[BOMB_SPRITE], car->GetX(), car->GetY() + car->GetHeight() / 2, 0, CarType::enemyBomb));
+		// same X
+		if (car->GetX() + car->GetWidth() / 2 > player->GetX() - player->GetWidth() / 2 && car->GetX() - car->GetWidth() / 2 < player->GetX() + player->GetWidth() / 2) {
+			// place bomb behind the car
+			if (car->GetY() < player->GetY()) {
+				int placeBombProbability = Random(0, DIFFICULTY);
+				if (placeBombProbability == 0) {
+					AddMissile(new Car(sprites[BOMB_SPRITE], car->GetX(), car->GetY() + car->GetHeight() / 2, 0, CarType::enemyBomb));
+				}
+			} // shoot a missile
+			else if (car->GetY() > player->GetY()) {
+				int shootProbability = Random(0, DIFFICULTY);
+				if (shootProbability == 0) {
+					AddMissile(new Car(sprites[MISSLE_SPRITE], car->GetX(), car->GetY() + car->GetHeight() / 2, car->GetSpeed() + MISSLE_SPEED/4, CarType::enemyMissile));
+				}
 			}
 		}
 	}
