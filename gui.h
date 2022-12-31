@@ -82,7 +82,7 @@ private:
 	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
 	void LoadSprite(const char* path);
-	void PrintGameInfo(const Point point);
+	void PrintGameInfo();
 	void PrintMap();
 	void Update();
 	void Frame();

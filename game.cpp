@@ -578,7 +578,7 @@ void Game::RemoveMissile(const int index)
 
 void Game::Shoot()
 {
-	if (worldTime - lastShot < shootCooldown)
+	if(!WeaponReady())
 		return;
 	lastShot = worldTime;
 	AmmoType ammo = player->Shoot();
@@ -586,6 +586,23 @@ void Game::Shoot()
 		Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED, CarType::missile);
 		AddMissile(missle);
 	}
+}
+
+bool Game::WeaponReady()
+{
+	if (worldTime - lastShot < shootCooldown)
+		return false;
+	return true;
+}
+
+double Game::GetShootCooldown(bool percent)
+{
+	double remaining = shootCooldown - (worldTime - lastShot);
+	if (remaining < 0)
+		remaining = 0;
+	if (percent)
+		return (remaining / shootCooldown)*100;
+	return remaining;
 }
 
 void Game::EnemyAction() {
@@ -637,6 +654,7 @@ void Game::SetState(State state)
 {
 	this->state = state;
 }
+
 
 int Game::Random(int from, int to)
 {

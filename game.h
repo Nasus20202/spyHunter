@@ -95,6 +95,8 @@ public:
 	bool CheckForCollision();
 	void Crash();
 	void Shoot();
+	bool WeaponReady();
+	double GetShootCooldown(bool percent = false);
 	void EnemyAction();
 	void AddPoints(const double points);
 	void CarDestroyed(Car* car, CarType type = CarType::crashed);

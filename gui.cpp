@@ -188,7 +188,7 @@ void Gui::Frame() {
 		DrawSurface(player->GetSurface(), { player->GetX(), player->GetY() });
 
 	// fps, time, score, game state...
-	PrintGameInfo({3, 3});
+	PrintGameInfo();
 	
 	// render
 	SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -265,9 +265,10 @@ void Gui::Update() {
 	}
 }
 
-void Gui::PrintGameInfo(const Point point) {
-	const int x = point.x + 2, y = point.x + 2, dy = 12;
-	DrawRectangle(Point(point.x, point.y), 100, 5*dy, GetRGB(BLACK));
+void Gui::PrintGameInfo() {
+	// left top
+	int x = 5, y = 5, dy = 12;
+	DrawRectangle(Point(x-2, y-2), 100, 3*dy, GetRGB(BLACK));
 	char info[128];
 	sprintf_s(info, "FPS: %.0lf", fps);
 	DrawText(info, Point(x, y), false);
@@ -275,11 +276,7 @@ void Gui::PrintGameInfo(const Point point) {
 	DrawText(info, Point(x, y + dy), false);
 	sprintf_s(info, "Speed: %.0lf", game->GetPlayer()->GetSpeed());
 	DrawText(info, Point(x, y + 2 * dy), false);
-	sprintf_s(info, "Score: %d", game->GetScore());
-	DrawText(info, Point(x, y + 3 * dy), false);
-	sprintf_s(info, "Lives: %d", game->GetLives());
-	DrawText(info, Point(x, y + 4 * dy), false);
-	// game status text
+	x = width / 2 - 150, y = height / 2;
 	switch (game->GetState()) {
 	case State::paused:
 		sprintf_s(info, "       PAUZA"); break;
@@ -288,7 +285,28 @@ void Gui::PrintGameInfo(const Point point) {
 	default:
 		sprintf_s(info, ""); break;
 	}
-	DrawText(info, Point(width/2 - 150, height/2));
+	DrawText(info, Point(x, y));
+	// right top
+	x = width, y = -2;
+	// //print shoot cooldown
+	for (int i = game->GetShootCooldown(true) / 10; i > 0; i--)
+		DrawText("-", { x - i * 9, y });
+	// print hearths
+	for (int i = game->GetLives(); i > 0; i--) {
+		DrawText("\3", { x - i * 20 - 5 , y + dy});
+	}
+	// left bottom
+	
+	// right bottom
+	x = width - 145, y = height - 70, dy = 20;
+	sprintf_s(info, "%d pkt.", game->GetScore());
+	DrawText(info, { x, y });
+	sprintf_s(info, "%d km/h", (int)(game->GetPlayer()->GetSpeed()*0.35));
+	DrawText(info, { x, y + dy});
+	sprintf_s(info, "%ds", (int)game->GetTime());
+	DrawText(info, { x, y + 2 * dy });
+	sprintf_s(info, "%d FPS", (int)fps);
+	DrawText(info, { x, y + 3 * dy },false);
 }
 
 void Gui::PrintMap()
