@@ -20,15 +20,15 @@
 #define START_LIVES 3
 #define MISSLE_SPEED 500
 #define SHOOT_COOLDOWN 0.5
-#define SOFT_CRASH_SPEED 250
+#define SOFT_CRASH_SPEED 400
 #define IMMORTAL_TIMER 5
 #define DIFFICULTY 200
-#define ENEMY_MISSILE_SPEED 125
+#define ENEMY_MISSILE_SPEED 150
 
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 500
 #define CAR_SPAWN_DISTANCE 200
-#define SPEED_DIFFERENCE 200
+#define SPEED_DIFFERENCE 300
 #define PENALTY_TIME 5
 #define ENEMY_POINTS 10
 #define START_SPEED 150
@@ -59,7 +59,7 @@ private:
 	Car* *missiles;
 	Player* player;
 	int carsAmount = 0, missilesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
-	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN, penaltyTime;
+	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN, penaltyTime, immortalTime;
 	Map* map;
 	State state;
 	SDL_Surface** sprites; int spritesAmount;

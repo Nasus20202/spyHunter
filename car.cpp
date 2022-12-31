@@ -129,13 +129,14 @@
 	{
 		if (this->type == CarType::crashedPlayer)
 			return;
+		const double steeringSpeed = SteeringSpeed();
 		if (this->moveBuffer > 0) {
-			this->moveBuffer-= SteeringSpeed();
-			this->MoveX(SteeringSpeed());
+			this->moveBuffer-= steeringSpeed;
+			this->MoveX(steeringSpeed);
 		}
 		else if (this->moveBuffer < 0) {
-			this->moveBuffer+= SteeringSpeed();
-			this->MoveX(-SteeringSpeed());
+			this->moveBuffer+= steeringSpeed;
+			this->MoveX(-steeringSpeed);
 		}
 		if (this->speedBuffer > 0) {
 			this->speedBuffer-= ACCELERATION;
@@ -145,6 +146,8 @@
 			this->speedBuffer+= ACCELERATION;
 			this->SetSpeed(this->GetSpeed() - ACCELERATION);
 		}
+		if (this->moveBuffer > -steeringSpeed && this->moveBuffer < steeringSpeed)
+			this->moveBuffer = 0;
 	}
 
 	int Player::GetAmmo()

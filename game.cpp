@@ -58,7 +58,7 @@ void Game::NewGame()
 	NewPlayer();
 	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0; 
 	shootCooldown = SHOOT_COOLDOWN; lastShot = 0;
-	lives = START_LIVES;
+	lives = START_LIVES; immortalTime = IMMORTAL_TIMER;
 	penaltyTime = -1;
 	NewMap();
 	for (int i = 0; i < Random(1, 10); i++) {
@@ -134,9 +134,13 @@ void Game::GenerateNewCar(bool onScreen) {
 		else
 			y = -CAR_SPAWN_DISTANCE;
 		if (y < 0)
-			speed = Random(MIN_CAR_SPEED, player->GetSpeed());
+			speed = Random(player->GetSpeed() - SPEED_DIFFERENCE, player->GetSpeed());
 		else
-			speed = Random(player->GetSpeed(), MAX_CAR_SPEED);
+			speed = Random(player->GetSpeed(), player->GetSpeed() + SPEED_DIFFERENCE);
+		if(speed > MAX_CAR_SPEED)
+			speed = MAX_CAR_SPEED;
+		if (speed < MIN_CAR_SPEED)
+			speed = MIN_CAR_SPEED;
 	}
 	Car* car;
 	if (Random(0, 1) == 0) {
@@ -239,6 +243,8 @@ bool Game::CheckForCollision()
 	bool result = false;
 	for (int i = 0; i < GetMissilesAmount(); i++) {
 		Car* missile = GetMissile(i); CarType type = missile->GetType();
+		if (missile->GetY() - missile->GetHeight() / 2 < 0 || missile->GetY() + missile->GetHeight() / 2 > screenHeight)
+			continue;
 		if (type == CarType::enemyMissile || type == CarType::enemyBomb) {
 			if (missile->CheckForCollision(player) == true) {
 				missile->SetX(player->GetX()); missile->SetY(player->GetY());
@@ -375,8 +381,9 @@ void Game::CarDestroyed(Car* car, CarType type) {
 
 void Game::Crash() {
 	player->Crash(sprites[CRASH_SPRITE]);
-	if(worldTime >= IMMORTAL_TIMER)
-		lives--;
+	if (worldTime >= immortalTime) {
+		lives--; immortalTime = worldTime + IMMORTAL_TIMER;
+	}
 	if (lives <= 0) {
 		state = State::dead;
 	}
