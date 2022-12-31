@@ -34,7 +34,7 @@
 #define START_SPEED 150
 #define MIN_CAR_SPEED 100
 #define MAX_CAR_SPEED 900
-#define CAR_SPAWN_RATE 100
+#define CAR_SPAWN_RATE 50
 
 
 #define PLAYER_SPRITE 0
