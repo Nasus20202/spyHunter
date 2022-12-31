@@ -163,7 +163,7 @@ void Game::GenerateNewCar(bool onScreen) {
 					break;
 				}
 		if (!ok)
-			car->SetY(car->GetY() + 20);
+			car->SetX(car->GetX() + 20);
 	}
 	AddCar(car);
 }
