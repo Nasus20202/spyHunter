@@ -172,7 +172,7 @@ void Game::Update(const double delta)
 {
 	worldTime += delta;
 	Player* player = this->GetPlayer();
-	player->Update();
+	player->Update(delta);
 	if (player->GetX() - player->GetWidth()/2 < 0)
 		player->SetX(player->GetWidth() / 2);
 	if (player->GetX() + player->GetWidth() / 2 > screenWidth)
@@ -200,7 +200,7 @@ void Game::Update(const double delta)
 	else {
 		double speed = player->GetSpeed();
 		if (speed > MAX_SPEED/2) {
-			player->SetSpeed(speed - 1.5*ACCELERATION);
+			player->SetSpeed(speed - 1.5*player->AccelerationSpeed());
 		}
 		int shaking = Random(-1, 1);
 		if (player->GetX() - player->GetWidth() / 2 - shaking >= 0 && player->GetX() + player->GetWidth() / 2 + shaking <= screenWidth)

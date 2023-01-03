@@ -3,8 +3,8 @@
 #include"./SDL2-2.0.10/include/SDL_main.h"
 #include "sprite.h"
 #include "map.h"
-#define ACCELERATION 1.5
-#define STEERING_FORCE 0.25
+#define ACCELERATION 150
+#define STEERING_FORCE 25
 #define MAX_SPEED 1000
 
 enum class CarType : char {
@@ -43,7 +43,7 @@ public:
 
 class Player : public Car {
 private:
-	double moveBuffer = 0, speedBuffer = 0;
+	double moveBuffer = 0, speedBuffer = 0, delta = 0;
 	int ammo = 0; AmmoType ammoType = AmmoType::missle;
 public:
 	Player(SDL_Surface* sprite, const int x, const int y, const double speed = 50 * ACCELERATION);
@@ -52,11 +52,12 @@ public:
 	void Brake();
 	void Right();
 	void Left();
-	void Update();
+	void Update(const double delta);
 	int GetAmmo();
 	void SetAmmo(int ammo);
 	AmmoType GetAmmoType();
 	void SetAmmoType(AmmoType ammoType);
 	double SteeringSpeed();
+	double AccelerationSpeed();
 	void Crash(SDL_Surface* crashedSprite);
 };

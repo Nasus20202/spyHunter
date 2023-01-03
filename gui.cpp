@@ -257,7 +257,7 @@ void Gui::Update() {
 		}
 		updateTimer = 0;
 	}
-	// update screen
+	// update screen, game update has priority
 	if (frameTimer >= frameTime) {
 		Frame();
 		frames++;

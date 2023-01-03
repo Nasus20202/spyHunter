@@ -89,17 +89,23 @@
 	void Player::Accelerate()
 	{
 		if ((this->GetSpeed() + speedBuffer) < MAX_SPEED)
-			this->speedBuffer += ACCELERATION;
-		if (this->GetSpeed() > MAX_SPEED)
+			this->speedBuffer += AccelerationSpeed();
+		if (this->GetSpeed() > MAX_SPEED) {
 			this->SetSpeed(MAX_SPEED);
+			if(speedBuffer > 0)
+				speedBuffer = 0;
+		}
 	}
 
 	void Player::Brake()
 	{
 		if ((this->GetSpeed() + speedBuffer) > 0)
-			this->speedBuffer -= ACCELERATION;
-		if (this->GetSpeed() < 0)
+			this->speedBuffer -= AccelerationSpeed();
+		if (this->GetSpeed() < 0) {
 			this->SetSpeed(0);
+			if (speedBuffer < 0)
+				speedBuffer = 0;
+		}
 	}
 
 	void Player::Right()
@@ -115,7 +121,11 @@
 	double Player::SteeringSpeed()
 	{
 		double speed = this->GetSpeed();
-		return pow(speed, 0.5) * STEERING_FORCE;
+		return pow(speed, 0.5) * STEERING_FORCE * delta;
+	}
+
+	double Player::AccelerationSpeed() {
+		return ACCELERATION * delta;
 	}
 
 	void Player::Crash(SDL_Surface* crashedSprite)
@@ -125,11 +135,12 @@
 		SetSpeed(0);
 	}
 
-	void Player::Update()
+	void Player::Update(const double delta)
 	{
+		this->delta = delta;
 		if (this->type == CarType::crashedPlayer)
 			return;
-		const double steeringSpeed = SteeringSpeed();
+		const double steeringSpeed = SteeringSpeed(), accelerationSpeed = AccelerationSpeed();
 		if (this->moveBuffer > 0) {
 			this->moveBuffer-= steeringSpeed;
 			this->MoveX(steeringSpeed);
@@ -139,15 +150,17 @@
 			this->MoveX(-steeringSpeed);
 		}
 		if (this->speedBuffer > 0) {
-			this->speedBuffer-= ACCELERATION;
-			this->SetSpeed(this->GetSpeed() + ACCELERATION);
+			this->speedBuffer-= accelerationSpeed;
+			this->SetSpeed(this->GetSpeed() + accelerationSpeed);
 		}
 		else if (this->speedBuffer < 0) {
-			this->speedBuffer+= ACCELERATION;
-			this->SetSpeed(this->GetSpeed() - ACCELERATION);
+			this->speedBuffer+= accelerationSpeed;
+			this->SetSpeed(this->GetSpeed() - accelerationSpeed);
 		}
 		if (this->moveBuffer > -steeringSpeed && this->moveBuffer < steeringSpeed)
 			this->moveBuffer = 0;
+		if (this->speedBuffer > -accelerationSpeed && this->speedBuffer < accelerationSpeed)
+			this->speedBuffer = 0;
 	}
 
 	int Player::GetAmmo()

@@ -18,7 +18,7 @@
 // frames per second cap
 #define FPS_CAP 250
 #define FRAME_TIME (1/((double)FPS_CAP))
-// game state refresh rate, including player input
+// game state refresh rate, including player input, it has priority over FPS_CAP
 #define UPDATE_RATE 100
 #define UPDATE_TIME (1/((double)UPDATE_RATE))
 
