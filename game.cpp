@@ -17,6 +17,10 @@ Game::Game(const int screenWidth, const int screenHeight, const int mapWidth, co
 
 Game::~Game()
 {
+	for (int i = 0; i < carsAmount; i++)
+		delete cars[i];
+	for (int i = 0; i < missilesAmount; i++)
+		delete missiles[i];
 	delete[] cars;
 	delete[] missiles;
 	delete player;
@@ -585,6 +589,7 @@ void Game::RemoveMissile(const int index)
 	for (int i = index; i < missilesAmount - 1; i++)
 		temp[i] = missiles[i + 1];
 	missilesAmount--;
+	delete missiles[index];
 	delete[] missiles;
 	missiles = temp;
 }
