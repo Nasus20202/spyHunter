@@ -23,6 +23,7 @@
 #define UPDATE_TIME (1/((double)UPDATE_RATE))
 
 #define SAVES_FOLDER "saves/"
+#define SAVE_EXTENSION ".dat"
 
 enum Color : Uint32 {
 	BLACK = 0x000000,
@@ -56,6 +57,7 @@ class Gui {
 private:
 	Game* game;
 	int t1, t2, frames = 0, spritesCount = 0, width, height;
+	bool menu = false;
 	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps, updateTime, frameTime;
 	SDL_Event event;
 	SDL_Surface* screen, *charsetBig, *charsetSmall;

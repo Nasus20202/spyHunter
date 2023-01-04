@@ -42,6 +42,7 @@ void Game::RemoveCar(const int index)
 	for (int i = index; i < carsAmount - 1; i++)
 		temp[i] = cars[i + 1];
 	carsAmount--;
+	delete cars[index];
 	delete[] cars;
 	cars = temp;
 }
@@ -49,9 +50,13 @@ void Game::RemoveCar(const int index)
 void Game::NewGame()
 {
 	state = State::playing;
+	for (int i = 0; i < carsAmount; i++)
+		delete cars[i];
 	delete[] cars;
 	cars = NULL;
 	carsAmount = 0;
+	for (int i = 0; i < missilesAmount; i++)
+		delete missiles[i];
 	delete[] missiles;
 	missiles = NULL;
 	missilesAmount = 0;

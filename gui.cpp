@@ -1,10 +1,9 @@
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
-#include <direct.h>
+#include <filesystem>
 #include "gui.h"
 #include "game.h"
 #include "car.h"
@@ -113,15 +112,15 @@ void Gui::SaveGame() {
 	time_t rawTime; struct tm* timeInfo = new tm();
 	time(&rawTime);
 	localtime_s(timeInfo, &rawTime);
-	strftime(timeStr, size, "%Y-%m-%d-%H-%M-%S.dat", timeInfo); // create time format
-	sprintf_s(name, size, "%s/%s", SAVES_FOLDER, timeStr);
-	if (_mkdir(SAVES_FOLDER) != 0 && errno != EEXIST) { // check if saves folder exits
+	strftime(timeStr, size, "%Y-%m-%d-%H-%M-%S", timeInfo); // create time format
+	sprintf_s(name, size, "%s/%s%s", SAVES_FOLDER, timeStr, SAVE_EXTENSION);
+	if (!std::filesystem::exists(SAVES_FOLDER) && !std::filesystem::create_directory(SAVES_FOLDER)) { // create saves folder
 		printf("Unable to create folder: %s\n", SAVES_FOLDER);
 		return;
 	}
-	fopen_s(&	file, name, "wb");
+	fopen_s(&file, name, "wb");
 	if (file == NULL) {
-		printf("Unable to open file for writing");
+		printf("Unable to open file for writing: %s\n", name);
 		return;
 	}
 	SaveToFile(file);
@@ -129,16 +128,76 @@ void Gui::SaveGame() {
 }
 
 void Gui::LoadGame() {
+	if (!std::filesystem::exists(SAVES_FOLDER)) // check if saves folder exists
+		return;
+	game->SetState(State::menu);
 	FILE* file; const int size = 64;
-	char name[size] = "saves/b.dat", input[size];
-	//sprintf_s(name, size, "%s/%s", SAVES_FOLDER, input);
+	char name[size], input[size] = ""; int fileCount = 0, counter = 0; char** files;
+	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
+		if (entry.is_regular_file() && entry.path().extension() == SAVE_EXTENSION)
+			fileCount++;
+	files = new char*[fileCount];
+	for (int i = 0; i < fileCount; i++)
+		files[i] = new char[size];
+	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
+		if (entry.is_regular_file() && entry.path().extension() == SAVE_EXTENSION) {
+			strcpy_s(files[counter], size, entry.path().filename().string().c_str());
+			counter++;
+		}
+	for (int i = 0; i < fileCount; i++)
+		printf("%d. %s\n", i + 1, files[i]);
+	
+	// create menu
+	int selected = 0; bool quit = false, accept = false;
+	while (!quit && !accept) {
+		DrawRectangle({ 0, 0 }, SCREEN_WIDTH, SCREEN_HEIGHT, FOREGROUND);
+		DrawText("Load game", { 10, 10 }, true);
+		for (int i = 0; i < fileCount; i++) {
+			if (i == selected)
+				DrawText(">", { 10, 50 + i * FONT_SIZE_BIG }, true);
+			DrawText(files[i], { 30, 50 + i * FONT_SIZE_BIG }, true);
+		}
+		while (SDL_PollEvent(&event) != 0 && event.type == SDL_KEYDOWN) {
+			switch (event.key.keysym.sym) {
+			case SDLK_UP:
+				selected--;
+				if (selected < 0)
+					selected = fileCount - 1;
+				break;
+			case SDLK_DOWN:
+				selected++;
+				if (selected >= fileCount)
+					selected = 0;
+				break;
+			case SDLK_RETURN:
+				accept = true;
+				break;
+			case SDLK_ESCAPE:
+				quit = true;
+				break;
+			}
+		}
+		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
+		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
+		SDL_RenderPresent(renderer);
+	}
+	if (quit) {
+		for (int i = 0; i < fileCount; i++)
+			delete[] files[i];
+		delete[] files; game->SetState(State::playing); return;
+	}
+	for (int i = 0; i < fileCount; i++)
+		delete[] files[i];
+	delete[] files;
+	sprintf_s(name, size, "%s%s", SAVES_FOLDER, input);
 	fopen_s(&file, name, "rb");
 	if (file == NULL) {
-		printf("Unable to open file for reading");
+		printf("Unable to open file for reading: %s\n", name); game->SetState(State::playing);
 		return;
 	}
 	LoadFromFile(file);
 	fclose(file);
+	game->SetState(State::playing);
 }
 
 // create and customize GUI
@@ -243,7 +302,7 @@ void Gui::Input(const SDL_Keycode key) {
 	case SDLK_s:
 		SaveGame(); break;
 	case SDLK_l:
-		LoadGame(); break;
+		menu = true; LoadGame(); break;
 	case SDLK_SPACE:
 		game->Shoot(); break;
 	}
@@ -267,6 +326,11 @@ void Gui::Update() {
 	t2 = SDL_GetTicks();
 	double delta = (t2 - t1) / 1000.0;
 	t1 = t2;
+	if (menu) {
+		delta = 0;
+		updateTimer = 0;
+		menu = false;
+	}
 	fpsTimer += delta;
 	updateTimer += delta;
 	frameTimer += delta;
