@@ -685,8 +685,8 @@ void Game::SaveToFile(FILE* file) {
 		cars[i]->SaveToFile(file);
 	for (int i = 0; i < missilesAmount; i++)
 		missiles[i]->SaveToFile(file);
-	map->SaveToFile(file);
 	player->SaveToFile(file);
+	map->SaveToFile(file);
 }
 
 void Game::LoadFromFile(FILE* file) {
@@ -718,8 +718,8 @@ void Game::LoadFromFile(FILE* file) {
 		missiles[i] = new Car();
 		missiles[i]->LoadFromFile(file);
 	}
-	map->LoadFromFile(file);
 	player->LoadFromFile(file);
+	map->LoadFromFile(file);
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
 		if (car->GetType() == CarType::enemy)

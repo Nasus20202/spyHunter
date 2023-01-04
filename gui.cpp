@@ -1,11 +1,10 @@
 #define _USE_MATH_DEFINES
-#include<cmath>
-#include<cstdio>
-#include<cstring>
-#include<cstdlib>
-#include<ctime>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
+#include <direct.h>
 #include "gui.h"
 #include "game.h"
 #include "car.h"
@@ -110,12 +109,17 @@ void Gui::Pause() {
 
 void Gui::SaveGame() {
 	const int size = 64;
-	char name[size]; FILE* file;
+	char name[size], timeStr[size]; FILE* file;
 	time_t rawTime; struct tm* timeInfo = new tm();
 	time(&rawTime);
 	localtime_s(timeInfo, &rawTime);
-	strftime(name, size, "%Y-%m-%d-%H-%M-%S.dat", timeInfo);
-	fopen_s(&file, name, "wb");
+	strftime(timeStr, size, "%Y-%m-%d-%H-%M-%S.dat", timeInfo); // create time format
+	sprintf_s(name, size, "%s/%s", SAVES_FOLDER, timeStr);
+	if (_mkdir(SAVES_FOLDER) != 0 && errno != EEXIST) { // check if saves folder exits
+		printf("Unable to create folder: %s\n", SAVES_FOLDER);
+		return;
+	}
+	fopen_s(&	file, name, "wb");
 	if (file == NULL) {
 		printf("Unable to open file for writing");
 		return;
@@ -126,7 +130,8 @@ void Gui::SaveGame() {
 
 void Gui::LoadGame() {
 	FILE* file; const int size = 64;
-	char name[size] = "b.dat";
+	char name[size] = "saves/b.dat", input[size];
+	//sprintf_s(name, size, "%s/%s", SAVES_FOLDER, input);
 	fopen_s(&file, name, "rb");
 	if (file == NULL) {
 		printf("Unable to open file for reading");

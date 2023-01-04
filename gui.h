@@ -22,6 +22,8 @@
 #define UPDATE_RATE 100
 #define UPDATE_TIME (1/((double)UPDATE_RATE))
 
+#define SAVES_FOLDER "saves/"
+
 enum Color : Uint32 {
 	BLACK = 0x000000,
 	BLUE = 0x0000FF,
