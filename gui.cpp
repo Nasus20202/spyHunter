@@ -128,8 +128,10 @@ void Gui::SaveGame() {
 }
 
 void Gui::LoadGame() {
-	if (!std::filesystem::exists(SAVES_FOLDER)) // check if saves folder exists
+	if (!std::filesystem::exists(SAVES_FOLDER) && !std::filesystem::create_directory(SAVES_FOLDER)) { // create saves folder
+		printf("Unable to create folder: %s\n", SAVES_FOLDER);
 		return;
+	}
 	FILE* file; const int size = 64;
 	char name[size], input[size] = ""; int fileCount = 0, counter = 0; char** files;
 	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
@@ -193,7 +195,10 @@ void Gui::LoadGame() {
 		}
 		changed = false;
 	}
-	strcpy_s(input, size, files[selected]);
+	if (selected >= 0 && selected < fileCount)
+		strcpy_s(input, size, files[selected]);
+	else
+		quit = true;
 	for (int i = 0; i < fileCount; i++)
 		delete[] files[i];
 	delete[] files;
@@ -383,14 +388,11 @@ void Gui::Update() {
 void Gui::PrintGameInfo() {
 	// left top
 	int x = 5, y = 5, dy = 12;
-	DrawRectangle(Point(x-2, y-2), 100, 3*dy, GetRGB(BLACK));
 	char info[128];
-	sprintf_s(info, "FPS: %.0lf", fps);
+	sprintf_s(info, "Krzysztof Nasuta");
 	DrawText(info, Point(x, y), false);
-	sprintf_s(info, "Time: %.1lfs", game->GetTime());
+	sprintf_s(info, "193328");
 	DrawText(info, Point(x, y + dy), false);
-	sprintf_s(info, "Speed: %.0lf", game->GetPlayer()->GetSpeed());
-	DrawText(info, Point(x, y + 2 * dy), false);
 	x = width / 2 - 150, y = height / 2;
 	switch (game->GetState()) {
 	case State::paused:
@@ -414,7 +416,7 @@ void Gui::PrintGameInfo() {
 	// left bottom
 	
 	// right bottom
-	x = width - 145, y = height - 70, dy = 20;
+	x = width - 145, y = height - 80, dy = 20;
 	sprintf_s(info, "%d pkt.", game->GetScore());
 	DrawText(info, { x, y });
 	sprintf_s(info, "%d km/h", (int)(game->GetPlayer()->GetSpeed()*0.35));
@@ -423,6 +425,8 @@ void Gui::PrintGameInfo() {
 	DrawText(info, { x, y + 2 * dy });
 	sprintf_s(info, "%d FPS", (int)fps);
 	DrawText(info, { x, y + 3 * dy },false);
+	sprintf_s(info, "a-f g-l");
+	DrawText(info, { x, (int)(y + 3.5 * dy) }, false);
 }
 
 void Gui::PrintMap()
