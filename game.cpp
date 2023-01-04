@@ -393,16 +393,16 @@ void Game::CarDestroyed(Car* car, bool player, CarType type) {
 }
 
 void Game::Crash() {
-	player->Crash(sprites[CRASH_SPRITE]);
 	if (worldTime >= immortalTime) {
+		player->Crash(sprites[CRASH_SPRITE]);
 		lives--; immortalTime = worldTime + IMMORTAL_TIMER;
+		Car* destroyed = new Car(sprites[1], player->GetX(), player->GetY(), 0, CarType::crashedPlayer);
+		AddCar(destroyed);
+		NewPlayer();
 	}
 	if (lives <= 0) {
 		state = State::dead;
 	}
-	Car* destroyed = new Car(sprites[1], player->GetX(), player->GetY(), 0, CarType::crashedPlayer);
-	AddCar(destroyed);
-	NewPlayer();
 }
 
 void Game::UpdateMap()
