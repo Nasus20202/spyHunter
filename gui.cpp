@@ -153,7 +153,9 @@ void Gui::LoadGame() {
 		const int lineHeight = FONT_SIZE_BIG;
 		const int linesPerScreen = (SCREEN_HEIGHT - 5 * lineHeight) / (double)lineHeight; int printedLine = 0;
 		for (int i = 0; i < fileCount; i++) {
-			if (i > selected - linesPerScreen / 2 && i < selected + linesPerScreen / 2){
+			if ((i > selected - linesPerScreen / 2 && i < selected + linesPerScreen / 2) ||
+						(selected < linesPerScreen / 2 && i < linesPerScreen) ||
+						(selected > fileCount - linesPerScreen / 2 && i > fileCount - linesPerScreen)) {
 				const int y = printedLine * lineHeight;
 				if (i == selected)
 					DrawText(">", { 10, 50 + y });
