@@ -132,8 +132,8 @@ void Gui::LoadGame() {
 		printf("Unable to create folder: %s\n", SAVES_FOLDER);
 		return;
 	}
-	FILE* file; const int size = 64;
-	char name[size], input[size] = ""; int fileCount = 0, counter = 0; char** files;
+	FILE* file; const int size = 256; // max file name length
+	char name[size+1], input[size] = ""; int fileCount = 0, counter = 0; char** files;
 	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
 		if (entry.is_regular_file() && entry.path().extension() == SAVE_EXTENSION)
 			fileCount++;
@@ -205,6 +205,7 @@ void Gui::LoadGame() {
 	if (quit) {
 		return;
 	}
+	name[size] = '\0';
 	sprintf_s(name, size, "%s%s", SAVES_FOLDER, input);
 	fopen_s(&file, name, "rb");
 	if (file == NULL) {
