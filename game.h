@@ -24,6 +24,7 @@
 #define IMMORTAL_TIMER 5
 #define DIFFICULTY 200
 #define ENEMY_MISSILE_SPEED 150
+#define POINTS_FOR_NEW_CAR 100
 
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 500
@@ -33,7 +34,7 @@
 #define ENEMY_POINTS 10
 #define START_SPEED 150
 #define MIN_CAR_SPEED 100
-#define MAX_CAR_SPEED 900
+#define MAX_CAR_SPEED 1000
 #define CAR_SPAWN_RATE 75
 
 

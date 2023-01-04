@@ -641,8 +641,12 @@ int Game::GetScore()
 
 void Game::AddPoints(const double points)
 {
-	if(worldTime > penaltyTime)
+	if (worldTime > penaltyTime) {
+		int usedPoints = score / POINTS_FOR_NEW_CAR;
 		score += points;
+		int newUsedPoints = score / POINTS_FOR_NEW_CAR;
+		lives += newUsedPoints - usedPoints;
+	}
 }
 
 int Game::GetLives()
