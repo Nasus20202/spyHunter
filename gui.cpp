@@ -145,8 +145,30 @@ void Gui::LoadGame() {
 		}
 	
 	// create menu
-	int selected = 0; bool quit = false, accept = false;
+	int selected = 0; bool quit = false, accept = false; bool changed = true;
 	while (!quit && !accept) {
+		while (SDL_PollEvent(&event) != 0 && event.type == SDL_KEYDOWN) {
+			switch (event.key.keysym.sym) {
+			case SDLK_UP:
+				selected--;
+				if (selected < 0)
+					selected = fileCount - 1;
+				changed = true;
+				break;
+			case SDLK_DOWN:
+				selected++;
+				if (selected >= fileCount)
+					selected = 0;
+				changed = true;
+				break;
+			case SDLK_RETURN:
+				accept = true;
+				break;
+			case SDLK_ESCAPE:
+				quit = true;
+				break;
+			}
+		}
 		DrawRectangle({ 0, 0 }, SCREEN_WIDTH, SCREEN_HEIGHT, FOREGROUND); //background
 		const int lineHeight = FONT_SIZE_BIG;
 		const int linesPerScreen = (SCREEN_HEIGHT - 5 * lineHeight) / (double)lineHeight; int printedLine = 0;
@@ -161,32 +183,15 @@ void Gui::LoadGame() {
 				printedLine++;
 			}
 		}
-		while (SDL_PollEvent(&event) != 0 && event.type == SDL_KEYDOWN) {
-			switch (event.key.keysym.sym) {
-			case SDLK_UP:
-				selected--;
-				if (selected < 0)
-					selected = fileCount - 1;
-				break;
-			case SDLK_DOWN:
-				selected++;
-				if (selected >= fileCount)
-					selected = 0;
-				break;
-			case SDLK_RETURN:
-				accept = true;
-				break;
-			case SDLK_ESCAPE:
-				quit = true;
-				break;
-			}
-		}
 		char text[64];
 		sprintf_s(text, "Wczytaj gre (%d zapisow)", fileCount);
 		DrawText(text, { 30, 20 });
-		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
-		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
-		SDL_RenderPresent(renderer);
+		if (changed) {
+			SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
+			SDL_RenderCopy(renderer, scrtex, NULL, NULL);
+			SDL_RenderPresent(renderer);
+		}
+		changed = false;
 	}
 	strcpy_s(input, size, files[selected]);
 	for (int i = 0; i < fileCount; i++)
