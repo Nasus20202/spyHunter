@@ -712,12 +712,16 @@ void Game::LoadFromFile(FILE* file) {
 	fread(&penaltyTime, sizeof(penaltyTime), 1, file);
 	fread(&immortalTime, sizeof(immortalTime), 1, file);
 	delete[] cars;
+	for (int i = 0; i < n; i++)
+		delete cars[i];
 	cars = new Car * [carsAmount];
 	for (int i = 0; i < carsAmount; i++) {
 		cars[i] = new Car();
 		cars[i]->LoadFromFile(file);
 	}
 	delete[] missiles;
+	for (int i = 0; i < m; i++)
+		delete missiles[i];
 	missiles = new Car * [missilesAmount];
 	for (int i = 0; i < missilesAmount; i++) {
 		missiles[i] = new Car();

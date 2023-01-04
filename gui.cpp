@@ -151,11 +151,17 @@ void Gui::LoadGame() {
 	int selected = 0; bool quit = false, accept = false;
 	while (!quit && !accept) {
 		DrawRectangle({ 0, 0 }, SCREEN_WIDTH, SCREEN_HEIGHT, FOREGROUND);
-		DrawText("Load game", { 10, 10 }, true);
+		DrawText("Wczytaj gre", { 30, 20 });
+		const int lineHeight = FONT_SIZE_BIG;
+		const int linesPerScreen = (SCREEN_HEIGHT - 5 * lineHeight) / (double)lineHeight; int printedLine = 0;
 		for (int i = 0; i < fileCount; i++) {
-			if (i == selected)
-				DrawText(">", { 10, 50 + i * FONT_SIZE_BIG }, true);
-			DrawText(files[i], { 30, 50 + i * FONT_SIZE_BIG }, true);
+			if (i > selected - linesPerScreen / 2 && i < selected + linesPerScreen / 2){
+				const int y = printedLine * lineHeight;
+				if (i == selected)
+					DrawText(">", { 10, 50 + y });
+				DrawText(files[i], { 30, 50 + y });
+				printedLine++;
+			}
 		}
 		while (SDL_PollEvent(&event) != 0 && event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
@@ -181,14 +187,12 @@ void Gui::LoadGame() {
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 		SDL_RenderPresent(renderer);
 	}
-	if (quit) {
-		for (int i = 0; i < fileCount; i++)
-			delete[] files[i];
-		delete[] files; game->SetState(State::playing); return;
-	}
 	for (int i = 0; i < fileCount; i++)
 		delete[] files[i];
 	delete[] files;
+	if (quit) {
+		game->SetState(State::playing); return;
+	}
 	sprintf_s(name, size, "%s%s", SAVES_FOLDER, input);
 	fopen_s(&file, name, "rb");
 	if (file == NULL) {
