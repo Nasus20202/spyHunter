@@ -24,7 +24,7 @@
 #define IMMORTAL_TIMER 5
 #define DIFFICULTY 200
 #define ENEMY_MISSILE_SPEED 150
-#define POINTS_FOR_NEW_CAR 100
+#define POINTS_FOR_NEW_CAR 200
 
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 500
@@ -34,8 +34,8 @@
 #define ENEMY_POINTS 10
 #define START_SPEED 150
 #define MIN_CAR_SPEED 100
-#define MAX_CAR_SPEED 1000
-#define CAR_SPAWN_RATE 75
+#define MAX_CAR_SPEED 1100
+#define CAR_SPAWN_RATE 100
 
 
 #define PLAYER_SPRITE 0
@@ -89,7 +89,7 @@ public:
 	double GetDistance();
 	int GetScore();
 	int GetLives();
-	void PushCar(Car* pusingCar, Car* pushedCar, bool destroyCars = false);
+	void PushCar(Car* pusingCar, Car* pushedCar, bool destroyCars = false, bool player = false);
 
 	void Update(const double delta);
 	void RemoveUnncessarySprites();
@@ -101,7 +101,7 @@ public:
 	double GetShootCooldown(bool percent = false);
 	void EnemyAction();
 	void AddPoints(const double points);
-	void CarDestroyed(Car* car, CarType type = CarType::crashed);
+	void CarDestroyed(Car* car, bool player = true, CarType type = CarType::crashed);
 	
 	void UpdateMap();
 	void CalculateRoadBorders();
