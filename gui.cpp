@@ -198,7 +198,7 @@ void Gui::LoadGame() {
 		delete[] files[i];
 	delete[] files;
 	if (quit) {
-		game->SetState(State::playing); return;
+		return;
 	}
 	sprintf_s(name, size, "%s%s", SAVES_FOLDER, input);
 	fopen_s(&file, name, "rb");
@@ -313,6 +313,8 @@ void Gui::Input(const SDL_Keycode key) {
 		SaveGame(); break;
 	case SDLK_l:
 		menu = true; LoadGame(); break;
+	case SDLK_f:
+		game->SetState(State::finished); break;
 	case SDLK_SPACE:
 		game->Shoot(); break;
 	}
@@ -394,6 +396,7 @@ void Gui::PrintGameInfo() {
 	case State::paused:
 		sprintf_s(info, "       PAUZA"); break;
 	case State::dead:
+	case State::finished:
 		sprintf_s(info, "KONIEC GRY (wynik %d)", game->GetScore()); break;
 	default:
 		sprintf_s(info, ""); break;
