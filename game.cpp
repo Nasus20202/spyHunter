@@ -686,6 +686,7 @@ void Game::SaveToFile(FILE* file) {
 	fwrite(&lastShot, sizeof(lastShot), 1, file);
 	fwrite(&penaltyTime, sizeof(penaltyTime), 1, file);
 	fwrite(&immortalTime, sizeof(immortalTime), 1, file);
+	fwrite(&state, sizeof(state), 1, file);
 	for (int i = 0; i < carsAmount; i++)
 		cars[i]->SaveToFile(file);
 	for (int i = 0; i < missilesAmount; i++)
@@ -715,6 +716,7 @@ void Game::LoadFromFile(FILE* file) {
 	fread(&lastShot, sizeof(lastShot), 1, file);
 	fread(&penaltyTime, sizeof(penaltyTime), 1, file);
 	fread(&immortalTime, sizeof(immortalTime), 1, file);
+	fread(&state, sizeof(state), 1, file);
 	cars = new Car * [carsAmount];
 	for (int i = 0; i < carsAmount; i++) {
 		cars[i] = new Car();
