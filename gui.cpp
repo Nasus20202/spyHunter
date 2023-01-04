@@ -141,11 +141,9 @@ void Gui::LoadGame() {
 		files[i] = new char[size];
 	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
 		if (entry.is_regular_file() && entry.path().extension() == SAVE_EXTENSION) {
-			strcpy_s(files[counter], size, entry.path().filename().string().c_str());
+			strcpy_s(files[fileCount-counter-1], size, entry.path().filename().string().c_str());
 			counter++;
 		}
-	for (int i = 0; i < fileCount; i++)
-		printf("%d. %s\n", i + 1, files[i]);
 	
 	// create menu
 	int selected = 0; bool quit = false, accept = false;
@@ -187,6 +185,7 @@ void Gui::LoadGame() {
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 		SDL_RenderPresent(renderer);
 	}
+	strcpy_s(input, size, files[selected]);
 	for (int i = 0; i < fileCount; i++)
 		delete[] files[i];
 	delete[] files;

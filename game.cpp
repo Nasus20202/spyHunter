@@ -695,9 +695,13 @@ void Game::SaveToFile(FILE* file) {
 }
 
 void Game::LoadFromFile(FILE* file) {
-	int n = carsAmount;
+	for (int i = 0; i < carsAmount; i++)
+		delete cars[i];
+	delete[] cars;
+	for (int i = 0; i < missilesAmount; i++)
+		delete missiles[i];
+	delete[] missiles;
 	fread(&carsAmount, sizeof(carsAmount), 1, file);
-	int m = carsAmount;
 	fread(&missilesAmount, sizeof(missilesAmount), 1, file);
 	fread(&lives, sizeof(lives), 1, file);
 	fread(&rightRoadBorder, sizeof(rightRoadBorder), 1, file);
@@ -711,17 +715,11 @@ void Game::LoadFromFile(FILE* file) {
 	fread(&lastShot, sizeof(lastShot), 1, file);
 	fread(&penaltyTime, sizeof(penaltyTime), 1, file);
 	fread(&immortalTime, sizeof(immortalTime), 1, file);
-	delete[] cars;
-	for (int i = 0; i < n; i++)
-		delete cars[i];
 	cars = new Car * [carsAmount];
 	for (int i = 0; i < carsAmount; i++) {
 		cars[i] = new Car();
 		cars[i]->LoadFromFile(file);
 	}
-	delete[] missiles;
-	for (int i = 0; i < m; i++)
-		delete missiles[i];
 	missiles = new Car * [missilesAmount];
 	for (int i = 0; i < missilesAmount; i++) {
 		missiles[i] = new Car();
