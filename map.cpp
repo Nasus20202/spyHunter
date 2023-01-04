@@ -45,3 +45,19 @@ int Map::GetHeight()
 {
 	return mapHeight;
 }
+
+void Map::SaveToFile(FILE* file) {
+	fwrite(&mapWidth, sizeof(mapWidth), 1, file);
+	fwrite(&mapHeight, sizeof(mapHeight), 1, file);
+	for (int i = 0; i < mapWidth * mapHeight; i++)
+		fwrite(&map[i], sizeof(map[i]), 1, file);
+}
+
+void Map::LoadFromFile(FILE* file){
+	fread(&mapWidth, sizeof(mapWidth), 1, file);
+	fread(&mapHeight, sizeof(mapHeight), 1, file);
+	delete[] map;
+	map = new MapTile[mapWidth * mapHeight];
+	for (int i = 0; i < mapWidth * mapHeight; i++)
+		fread(&map[i], sizeof(map[i]), 1, file); 
+}

@@ -56,7 +56,7 @@ void Game::NewGame()
 	missiles = NULL;
 	missilesAmount = 0;
 	NewPlayer();
-	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; frame = 0; score = 0; 
+	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; score = 0; 
 	shootCooldown = SHOOT_COOLDOWN; lastShot = 0;
 	lives = START_LIVES; immortalTime = IMMORTAL_TIMER;
 	penaltyTime = -1;
@@ -655,7 +655,6 @@ void Game::SetState(State state)
 	this->state = state;
 }
 
-
 int Game::Random(int from, int to)
 {
 	if (to < from) {
@@ -665,4 +664,78 @@ int Game::Random(int from, int to)
 	}
 	int diff = to - from + 1;
 	return rand() % diff + from;
+}
+
+void Game::SaveToFile(FILE* file) {
+	fwrite(&carsAmount, sizeof(carsAmount), 1, file);
+	fwrite(&missilesAmount, sizeof(missilesAmount), 1, file);
+	fwrite(&lives, sizeof(lives), 1, file);
+	fwrite(&rightRoadBorder, sizeof(rightRoadBorder), 1, file);
+	fwrite(&leftRoadBorder, sizeof(leftRoadBorder), 1, file);
+	fwrite(&trafficIsland, sizeof(trafficIsland), 1, file);
+	fwrite(&mapUpdate, sizeof(mapUpdate), 1, file);
+	fwrite(&islandLength, sizeof(islandLength), 1, file);
+	fwrite(&worldTime, sizeof(worldTime), 1, file);
+	fwrite(&distance, sizeof(distance), 1, file);
+	fwrite(&score, sizeof(score), 1, file);
+	fwrite(&lastShot, sizeof(lastShot), 1, file);
+	fwrite(&penaltyTime, sizeof(penaltyTime), 1, file);
+	fwrite(&immortalTime, sizeof(immortalTime), 1, file);
+	for (int i = 0; i < carsAmount; i++)
+		cars[i]->SaveToFile(file);
+	for (int i = 0; i < missilesAmount; i++)
+		missiles[i]->SaveToFile(file);
+	map->SaveToFile(file);
+	player->SaveToFile(file);
+}
+
+void Game::LoadFromFile(FILE* file) {
+	int n = carsAmount;
+	fread(&carsAmount, sizeof(carsAmount), 1, file);
+	int m = carsAmount;
+	fread(&missilesAmount, sizeof(missilesAmount), 1, file);
+	fread(&lives, sizeof(lives), 1, file);
+	fread(&rightRoadBorder, sizeof(rightRoadBorder), 1, file);
+	fread(&leftRoadBorder, sizeof(leftRoadBorder), 1, file);
+	fread(&trafficIsland, sizeof(trafficIsland), 1, file);
+	fread(&mapUpdate, sizeof(mapUpdate), 1, file);
+	fread(&islandLength, sizeof(islandLength), 1, file);
+	fread(&worldTime, sizeof(worldTime), 1, file);
+	fread(&distance, sizeof(distance), 1, file);
+	fread(&score, sizeof(score), 1, file);
+	fread(&lastShot, sizeof(lastShot), 1, file);
+	fread(&penaltyTime, sizeof(penaltyTime), 1, file);
+	fread(&immortalTime, sizeof(immortalTime), 1, file);
+	delete[] cars;
+	cars = new Car * [carsAmount];
+	for (int i = 0; i < carsAmount; i++) {
+		cars[i] = new Car();
+		cars[i]->LoadFromFile(file);
+	}
+	delete[] missiles;
+	missiles = new Car * [missilesAmount];
+	for (int i = 0; i < missilesAmount; i++) {
+		missiles[i] = new Car();
+		missiles[i]->LoadFromFile(file);
+	}
+	map->LoadFromFile(file);
+	player->LoadFromFile(file);
+	for (int i = 0; i < GetCarsAmount(); i++) {
+		Car* car = GetCar(i);
+		if (car->GetType() == CarType::enemy)
+			car->SetSurface(sprites[Random(ENEMY_SPRITES_START, spritesAmount - 1)]);
+		else if (car->GetType() == CarType::civil)
+			car->SetSurface(sprites[Random(CARS_SPRITES_START, ENEMY_SPRITES_START - 1)]);
+		else
+			car->SetSurface(sprites[CRASH_SPRITE]);
+	}
+	for (int i = 0; i < GetMissilesAmount(); i++){
+		Car* missile = GetMissile(i);
+		if (missile->GetType() == CarType::enemyMissile || missile->GetType() == CarType::missile)
+			missile->SetSurface(sprites[MISSLE_SPRITE]);
+		else if (missile->GetType() == CarType::enemyBomb || missile->GetType() == CarType::bomb)
+			missile->SetSurface(sprites[BOMB_SPRITE]);
+		else
+			missile->SetSurface(sprites[CRASH_SPRITE]);
+	}
 }

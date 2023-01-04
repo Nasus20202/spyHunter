@@ -4,6 +4,8 @@
 #include<cstring>
 #include<cstdlib>
 #include<ctime>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "gui.h"
 #include "game.h"
 #include "car.h"
@@ -106,6 +108,34 @@ void Gui::Pause() {
 		game->SetState(State::playing);
 }
 
+void Gui::SaveGame() {
+	const int size = 64;
+	char name[size]; FILE* file;
+	time_t rawTime; struct tm* timeInfo = new tm();
+	time(&rawTime);
+	localtime_s(timeInfo, &rawTime);
+	strftime(name, size, "%Y-%m-%d-%H-%M-%S.dat", timeInfo);
+	fopen_s(&file, name, "wb");
+	if (file == NULL) {
+		printf("Unable to open file for writing");
+		return;
+	}
+	SaveToFile(file);
+	fclose(file);
+}
+
+void Gui::LoadGame() {
+	FILE* file; const int size = 64;
+	char name[size] = "b.dat";
+	fopen_s(&file, name, "rb");
+	if (file == NULL) {
+		printf("Unable to open file for reading");
+		return;
+	}
+	LoadFromFile(file);
+	fclose(file);
+}
+
 // create and customize GUI
 void Gui::Initialize(const int width, const int height, const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -205,6 +235,10 @@ void Gui::Input(const SDL_Keycode key) {
 		NewGame(); break;
 	case SDLK_p:
 		Pause(); break;
+	case SDLK_s:
+		SaveGame(); break;
+	case SDLK_l:
+		LoadGame(); break;
 	case SDLK_SPACE:
 		game->Shoot(); break;
 	}
@@ -213,13 +247,13 @@ void Gui::Input(const SDL_Keycode key) {
 // fast input for steering
 void Gui::GameInput()
 {
-	if (currentKeyStates[SDL_SCANCODE_LEFT] || currentKeyStates[SDL_SCANCODE_A])
+	if (currentKeyStates[SDL_SCANCODE_LEFT])
 		game->GetPlayer()->Left();
-	if (currentKeyStates[SDL_SCANCODE_RIGHT] || currentKeyStates[SDL_SCANCODE_D])
+	if (currentKeyStates[SDL_SCANCODE_RIGHT])
 		game->GetPlayer()->Right();
-	if (currentKeyStates[SDL_SCANCODE_UP] || currentKeyStates[SDL_SCANCODE_W])
+	if (currentKeyStates[SDL_SCANCODE_UP])
 		game->GetPlayer()->Accelerate();
-	if (currentKeyStates[SDL_SCANCODE_DOWN] || currentKeyStates[SDL_SCANCODE_S])
+	if (currentKeyStates[SDL_SCANCODE_DOWN])
 		game->GetPlayer()->Brake();
 }
 
@@ -354,6 +388,14 @@ void Gui::Exit() {
 	SDL_Quit();
 	delete[] sprites;
 	delete game;
+}
+
+void Gui::SaveToFile(FILE* file) {
+	game->SaveToFile(file);
+}
+
+void Gui::LoadFromFile(FILE* file) {
+	game->LoadFromFile(file);
 }
 
 	

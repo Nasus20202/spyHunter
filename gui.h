@@ -78,6 +78,8 @@ private:
 
 	void NewGame();
 	void Pause();
+	void SaveGame();
+	void LoadGame();
 	
 	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
@@ -89,6 +91,8 @@ private:
 	void Input(const SDL_Keycode code);
 	void GameInput();
 	void Exit();
+	void SaveToFile(FILE* file);
+	void LoadFromFile(FILE* file);
 public:
 	Gui(const int width = SCREEN_WIDTH, const int height = SCREEN_HEIGHT, const double updateTime = UPDATE_TIME, const double frameTime = FRAME_TIME, const char* title = TITLE);
 	~Gui();

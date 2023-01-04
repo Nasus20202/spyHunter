@@ -67,6 +67,20 @@
 		return resultTile;
 	}
 
+	void Car::SaveToFile(FILE* file) {
+		fwrite(&x, sizeof(x), 1, file);
+		fwrite(&y, sizeof(y), 1, file);
+		fwrite(&speed, sizeof(speed), 1, file);
+		fwrite(&type, sizeof(type), 1, file);
+	}
+
+	void Car::LoadFromFile(FILE* file) {
+		fread(&x, sizeof(x), 1, file);
+		fread(&y, sizeof(y), 1, file);
+		fread(&speed, sizeof(speed), 1, file);
+		fread(&type, sizeof(type), 1, file);
+	}
+
 #pragma endregion
 
 #pragma region Player 
@@ -181,6 +195,28 @@
 	void Player::SetAmmoType(AmmoType ammoType)
 	{
 		this->ammoType = ammoType;
+	}
+
+	void Player::SaveToFile(FILE* file) {
+		fwrite(&x, sizeof(x), 1, file);
+		fwrite(&y, sizeof(y), 1, file);
+		fwrite(&speed, sizeof(speed), 1, file);
+		fwrite(&type, sizeof(type), 1, file);
+		fwrite(&moveBuffer, sizeof(moveBuffer), 1, file);
+		fwrite(&speedBuffer, sizeof(speedBuffer), 1, file);
+		fwrite(&ammo, sizeof(ammo), 1, file);
+		fwrite(&ammoType, sizeof(ammoType), 1, file);
+	}
+
+	void Player::LoadFromFile(FILE* file) {
+		fread(&x, sizeof(x), 1, file);
+		fread(&y, sizeof(y), 1, file);
+		fread(&speed, sizeof(speed), 1, file);
+		fread(&type, sizeof(type), 1, file);
+		fread(&moveBuffer, sizeof(moveBuffer), 1, file);
+		fread(&speedBuffer, sizeof(speedBuffer), 1, file);
+		fread(&ammo, sizeof(ammo), 1, file);
+		fread(&ammoType, sizeof(ammoType), 1, file);
 	}
 
 #pragma endregion

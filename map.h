@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdio>
 
 enum class MapTile : char {
 	grass,
@@ -18,4 +19,6 @@ public:
 	int GetHeight();
 	MapTile GetMapTile(const int x, const int y);
 	void SetMapTile(const int x, const int y, const MapTile value);
+	void SaveToFile(FILE* file);
+	void LoadFromFile(FILE* file);
 };

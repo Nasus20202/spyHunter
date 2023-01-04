@@ -39,6 +39,8 @@ public:
 	double GetSpeed();
 	void Update(const double delta, const double playerSpeed);
 	MapTile CheckForCollisionWithMap(const int screenWidth, const int screenHeight, Map* map);
+	void SaveToFile(FILE* file);
+	void LoadFromFile(FILE* file);
 };
 
 class Player : public Car {
@@ -60,4 +62,6 @@ public:
 	double SteeringSpeed();
 	double AccelerationSpeed();
 	void Crash(SDL_Surface* crashedSprite);
+	void SaveToFile(FILE* file);
+	void LoadFromFile(FILE* file);
 };

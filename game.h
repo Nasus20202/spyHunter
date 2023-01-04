@@ -58,7 +58,8 @@ private:
 	Car* *cars;
 	Car* *missiles;
 	Player* player;
-	int carsAmount = 0, missilesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight, frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
+	int carsAmount = 0, missilesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight,
+		frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
 	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN, penaltyTime, immortalTime;
 	Map* map;
 	State state;
@@ -116,5 +117,7 @@ public:
 	void SetState(State state);
 
 	int Random(int from, int to);
+	void SaveToFile(FILE* file);
+	void LoadFromFile(FILE* file);
 };
 
