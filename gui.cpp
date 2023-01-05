@@ -321,7 +321,8 @@ void Gui::Input(const SDL_Keycode key) {
 	case SDLK_f:
 		game->SetState(State::finished); break;
 	case SDLK_SPACE:
-		game->Shoot(); break;
+		if(game->GetState() == State::playing)
+			game->Shoot(); break;
 	}
 }
 
@@ -418,13 +419,13 @@ void Gui::PrintGameInfo() {
 	switch (game->GetPlayer()->GetAmmoType())
 	{
 	case AmmoType::missile:
-		sprintf_s(info, "Rakiety"); break;
+		sprintf_s(info, "       Rakiety"); break;
 	case AmmoType::multiMissile:
 		sprintf_s(info, "%dx MultiRakiety", ammo); break;
 	case AmmoType::bomb:
-		sprintf_s(info, "%dx Bomby", ammo); break;
+		sprintf_s(info, "     %dx Bomby", ammo); break;
 	case AmmoType::laser:
-		sprintf_s(info, "%dx Laser", ammo); break;
+		sprintf_s(info, "     %dx Laser", ammo); break;
 	}
 	DrawText(info, { x - 120 , y + 3 * dy }, false);
 	// left bottom
