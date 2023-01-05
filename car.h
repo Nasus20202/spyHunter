@@ -21,8 +21,10 @@ enum class CarType : char {
 };
 
 enum class AmmoType : char {
-	missle,
-	bomb
+	missile,
+	bomb,
+	multiMissile,
+	laser
 };
 
 class Car : public Sprite {
@@ -46,10 +48,11 @@ public:
 class Player : public Car {
 private:
 	double moveBuffer = 0, speedBuffer = 0, delta = 0;
-	int ammo = 0; AmmoType ammoType = AmmoType::missle;
+	int ammo = 0; AmmoType ammoType = AmmoType::missile;
 public:
 	Player(SDL_Surface* sprite, const int x, const int y, const double speed = 50 * ACCELERATION);
 	AmmoType Shoot();
+	double GetShootCooldown();
 	void Accelerate();
 	void Brake();
 	void Right();

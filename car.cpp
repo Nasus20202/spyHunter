@@ -89,14 +89,31 @@
 	{
 	}
 
+	double Player::GetShootCooldown() {
+		switch (ammoType) {
+		case AmmoType::multiMissile:
+			return 1;
+		case AmmoType::bomb:
+			return 3;
+		case AmmoType::laser:
+			return 0.001;
+		default:
+			return 0.5;
+		}
+	}
+
 	AmmoType Player::Shoot()
 	{
 		if (ammo > 0)
 		{
 			ammo--;
-			return ammoType;
+			AmmoType result = ammoType;
+			if (ammo == 0) {
+				ammoType = AmmoType::missile;
+			}
+			return result;
 		}
-		ammoType = AmmoType::missle;
+		ammoType = AmmoType::missile;
 		return ammoType;
 	}
 

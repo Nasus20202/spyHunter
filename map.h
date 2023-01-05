@@ -5,6 +5,7 @@ enum class MapTile : char {
 	grass,
 	road,
 	stripes,
+	powerUp
 };
 
 class Map {

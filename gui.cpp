@@ -406,13 +406,27 @@ void Gui::PrintGameInfo() {
 	DrawText(info, Point(x, y));
 	// right top
 	x = width, y = -2;
-	// //print shoot cooldown
+	//print shoot cooldown
 	for (int i = game->GetShootCooldown(true) / 10; i > 0; i--)
 		DrawText("-", { x - i * 9, y });
 	// print hearths
 	for (int i = game->GetLives(); i > 0; i--) {
 		DrawText("\3", { x - i * 20 - 5 , y + dy});
 	}
+	// print weapon type
+	const int ammo = game->GetPlayer()->GetAmmo();
+	switch (game->GetPlayer()->GetAmmoType())
+	{
+	case AmmoType::missile:
+		sprintf_s(info, "Rakiety"); break;
+	case AmmoType::multiMissile:
+		sprintf_s(info, "%dx MultiRakiety", ammo); break;
+	case AmmoType::bomb:
+		sprintf_s(info, "%dx Bomby", ammo); break;
+	case AmmoType::laser:
+		sprintf_s(info, "%dx Laser", ammo); break;
+	}
+	DrawText(info, { x - 120 , y + 3 * dy }, false);
 	// left bottom
 	
 	// right bottom
@@ -445,6 +459,9 @@ void Gui::PrintMap()
 				break;
 			case MapTile::stripes:
 				DrawRectangle({ (int)(x * blockWidth), (int)(y * blockHeight) }, blockWidth, blockHeight + 1, GetRGB(WHITE)); drawRoad = true;
+				break;
+			case MapTile::powerUp:
+				DrawRectangle({ (int)(x * blockWidth), (int)(y * blockHeight) }, blockWidth, blockHeight + 1, GetRGB(YELLOW)); drawRoad = true;
 				break;
 			default:
 				drawRoad = true;

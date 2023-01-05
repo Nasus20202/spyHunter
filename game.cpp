@@ -66,7 +66,7 @@ void Game::NewGame()
 	missilesAmount = 0;
 	NewPlayer();
 	worldTime = 0; frame = 0; distance = 0; distanceDiff = 0; score = 0; 
-	shootCooldown = SHOOT_COOLDOWN; lastShot = 0;
+	lastShot = 0;
 	lives = START_LIVES; immortalTime = IMMORTAL_TIMER;
 	penaltyTime = -1;
 	NewMap();
@@ -203,7 +203,8 @@ void Game::Update(const double delta)
 	}
 	RemoveUnncessarySprites();
 	// player not on the grass
-	if (!CheckForCollision()) {
+	MapTile tile = CheckForCollision();
+	if (tile != MapTile::grass) {
 		AddPoints(scoreDiff);
 	} // grass penalty
 	else {
@@ -215,6 +216,8 @@ void Game::Update(const double delta)
 		if (player->GetX() - player->GetWidth() / 2 - shaking >= 0 && player->GetX() + player->GetWidth() / 2 + shaking <= screenWidth)
 			player->MoveX(shaking);
 	}
+	if (tile == MapTile::powerUp)
+		PowerUp();
 	if (Random(0, CAR_SPAWN_RATE) == 0)
 		GenerateNewCar();
 	EnemyAction();
@@ -247,9 +250,8 @@ void Game::RemoveUnncessarySprites()
 }
 
 // return true if player touches grass
-bool Game::CheckForCollision()
+MapTile Game::CheckForCollision()
 {
-	bool result = false;
 	for (int i = 0; i < GetMissilesAmount(); i++) {
 		Car* missile = GetMissile(i); CarType type = missile->GetType();
 		if (missile->GetY() - missile->GetHeight() / 2 < 0 || missile->GetY() + missile->GetHeight() / 2 > screenHeight)
@@ -264,7 +266,7 @@ bool Game::CheckForCollision()
 		else {
 			for (int j = 0; j < GetCarsAmount(); j++) {
 				Car* car = GetCar(j);
-				if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil || missile->GetType() != CarType::missile)
+				if (car->GetType() != CarType::enemy && car->GetType() != CarType::civil || missile->GetType() != CarType::missile && missile->GetType() != CarType::bomb)
 					continue;
 				if (missile->CheckForCollision(car) == true) {
 					missile->SetX(car->GetX()); missile->SetY(car->GetY());
@@ -321,9 +323,6 @@ bool Game::CheckForCollision()
 		}
 	}
 	MapTile tile = GetPlayer()->CheckForCollisionWithMap(screenWidth, screenHeight, map);
-	if (tile == MapTile::grass) {
-		result = true;
-	}
 	for (int i = 0; i < GetCarsAmount(); i++) {
 		Car* car = GetCar(i);
 		if (car->GetType() != CarType::civil && car->GetType() != CarType::enemy)
@@ -335,7 +334,7 @@ bool Game::CheckForCollision()
 				PushCar(car, otherCar);
 		}
 	}
-	return result;
+	return tile;
 }
 
 void Game::PushCar(Car* pushingCar, Car* pushedCar, bool destroyCars, bool player) {
@@ -409,6 +408,21 @@ void Game::Crash() {
 	}
 }
 
+void Game::PowerUp() {
+	const int multiMissleAmmo = 3, bombAmmo = 1, laserAmmo = 10;
+	if (player->GetAmmoType() == AmmoType::missile) {
+		const int powerUpAmmoTypesAmount = 3;
+		switch (Random(0, powerUpAmmoTypesAmount - 1)) {
+		case 0:
+			player->SetAmmoType(AmmoType::multiMissile); player->SetAmmo(multiMissleAmmo); break;
+		case 1:
+			player->SetAmmoType(AmmoType::bomb); player->SetAmmo(bombAmmo); break;
+		case 2:
+			player->SetAmmoType(AmmoType::laser); player->SetAmmo(laserAmmo); break;
+		}
+	}
+}
+
 void Game::UpdateMap()
 {
 	// copy old map
@@ -432,6 +446,13 @@ void Game::UpdateMap()
 		}
 		else
 			SetMapTile(x, 0, MapTile::road);
+	}
+	if (Random(0, POWER_UP_SPAWN_RATE) == 0) {
+		const int width = Random(1, 10), startX = Random(rightRoadBorder+ width / 2, leftRoadBorder - width / 2), endX = startX + width;
+		for (int x = startX; x < endX; x++) {
+			if(GetMapTile(x, 0) != MapTile::grass)
+				SetMapTile(x, 0, MapTile::powerUp);
+		}
 	}
 	// add stripes at borded of the road
 	for (int x = 0; x < mapWidth; x++) {
@@ -600,26 +621,42 @@ void Game::Shoot()
 		return;
 	lastShot = worldTime;
 	AmmoType ammo = player->Shoot();
-	if (ammo == AmmoType::missle) {
+	if (ammo == AmmoType::missile) {
 		Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED, CarType::missile);
+		AddMissile(missle);
+	}
+	else if (ammo == AmmoType::multiMissile) {
+		for (int i = -MULTI_MISSILE_AMOUNT/2; i <= MULTI_MISSILE_AMOUNT/2; i++) {
+			Car* missle = new Car(sprites[MISSLE_SPRITE], player->GetX() + i * 50, player->GetY() + player->GetHeight() / 2, player->GetSpeed() + MISSLE_SPEED, CarType::missile);
+			AddMissile(missle);
+		}
+	}
+	else if (ammo == AmmoType::bomb) {
+		for (int i = -BOMB_AMOUNT/2; i <= BOMB_AMOUNT/2; i++) {
+			Car* missle = new Car(sprites[BOMB_SPRITE], player->GetX() + i * 50, player->GetY() + player->GetHeight() / 2, player->GetSpeed() - 100, CarType::bomb);
+			AddMissile(missle);
+		}
+	}
+	else if (ammo == AmmoType::laser) {
+		Car* missle = new Car(sprites[LASER_SPRITE], player->GetX(), player->GetY() + player->GetHeight() / 2, player->GetSpeed() + 1000, CarType::missile);
 		AddMissile(missle);
 	}
 }
 
 bool Game::WeaponReady()
 {
-	if (worldTime - lastShot < shootCooldown)
+	if (worldTime - lastShot < player->GetShootCooldown())
 		return false;
 	return true;
 }
 
 double Game::GetShootCooldown(bool percent)
 {
-	double remaining = shootCooldown - (worldTime - lastShot);
+	double remaining = player->GetShootCooldown() - (worldTime - lastShot);
 	if (remaining < 0)
 		remaining = 0;
 	if (percent)
-		return (remaining / shootCooldown)*100;
+		return (remaining / player->GetShootCooldown())*100;
 	return remaining;
 }
 

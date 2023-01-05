@@ -19,7 +19,6 @@
 #define SCORE_DIVIDER 100
 #define START_LIVES 3
 #define MISSLE_SPEED 500
-#define SHOOT_COOLDOWN 0.5
 #define SOFT_CRASH_SPEED 400
 #define IMMORTAL_TIMER 5
 #define DIFFICULTY 200
@@ -36,14 +35,18 @@
 #define MIN_CAR_SPEED 100
 #define MAX_CAR_SPEED 1100
 #define CAR_SPAWN_RATE 100
+#define POWER_UP_SPAWN_RATE 1000
+#define MULTI_MISSILE_AMOUNT 3
+#define BOMB_AMOUNT 5
 
 
 #define PLAYER_SPRITE 0
 #define CRASH_SPRITE 1
 #define MISSLE_SPRITE 2
 #define BOMB_SPRITE 3
-#define CARS_SPRITES_START 4
-#define ENEMY_SPRITES_START 8
+#define LASER_SPRITE 4
+#define CARS_SPRITES_START 5
+#define ENEMY_SPRITES_START 9
 
 enum class State : char {
 	playing,
@@ -61,7 +64,7 @@ private:
 	Player* player;
 	int carsAmount = 0, missilesAmount = 0, mapWidth, mapHeight, screenWidth, screenHeight,
 		frame = 0, lives, rightRoadBorder, leftRoadBorder, trafficIsland, mapUpdate, islandLength;
-	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, shootCooldown = SHOOT_COOLDOWN, penaltyTime, immortalTime;
+	double worldTime = 0, distance = 0, distanceDiff = 0, score, lastShot, penaltyTime, immortalTime;
 	Map* map;
 	State state;
 	SDL_Surface** sprites; int spritesAmount;
@@ -94,9 +97,10 @@ public:
 	void Update(const double delta);
 	void RemoveUnncessarySprites();
 	void NewMap();
-	bool CheckForCollision();
+	MapTile CheckForCollision();
 	void Crash();
 	void Shoot();
+	void PowerUp();
 	bool WeaponReady();
 	double GetShootCooldown(bool percent = false);
 	void EnemyAction();
