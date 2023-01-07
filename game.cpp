@@ -249,7 +249,7 @@ void Game::RemoveUnncessarySprites()
 	
 }
 
-// return true if player touches grass
+// return map tile touched by player
 MapTile Game::CheckForCollision()
 {
 	for (int i = 0; i < GetMissilesAmount(); i++) {
@@ -337,6 +337,7 @@ MapTile Game::CheckForCollision()
 	return tile;
 }
 
+// allow cars to be pushed
 void Game::PushCar(Car* pushingCar, Car* pushedCar, bool destroyCars, bool player) {
 	if ((pushingCar->GetType() != CarType::player && pushingCar->GetType() != CarType::civil && pushingCar->GetType() != CarType::enemy) ||
 		(pushedCar->GetType() != CarType::player && pushedCar->GetType() != CarType::civil && pushedCar->GetType() != CarType::enemy))
@@ -464,6 +465,7 @@ void Game::UpdateMap()
 	mapUpdate++;
 }
 
+// update road generaton variables
 void Game::CalculateRoadBorders() {
 	int rightDiff = Random(-1, 1), leftDiff = Random(-1, 1), islandDiff = Random(-5, 1);
 	if (rightRoadBorder < mapWidth * 0.1)

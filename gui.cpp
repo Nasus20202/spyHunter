@@ -241,6 +241,7 @@ void Gui::Initialize(const int width, const int height, const char* title) {
 	charsetBig = LoadSurface(CHARSET_BIG);
 	charsetSmall = LoadSurface(CHARSET_SMALL);
 	LoadSprites();
+	LoadResults();
 	game->SetSprites(sprites, spritesCount);
 	srand(time(NULL));
 	NewGame();
@@ -320,6 +321,8 @@ void Gui::Input(const SDL_Keycode key) {
 		menu = true; LoadGame(); break;
 	case SDLK_f:
 		game->SetState(State::finished); break;
+	case SDLK_r:
+		menu = true; ShowResults(); break;
 	case SDLK_SPACE:
 		if(game->GetState() == State::playing)
 			game->Shoot(); break;
@@ -359,6 +362,7 @@ void Gui::Update() {
 		fpsTimer -= 0.5;
 	}
 	// update game state
+	State state = game->GetState();
 	if (updateTimer >= updateTime) {
 		// handle events
 		while (SDL_PollEvent(&event) != 0) {
@@ -383,6 +387,9 @@ void Gui::Update() {
 		Frame();
 		frames++;
 		frameTimer = 0;
+	}
+	if (state != game->GetState() && (game->GetState() == State::finished || game->GetState() == State::dead)) {
+		AddResult(Result(game->GetScore(), game->GetTime()));
 	}
 }
 
@@ -440,7 +447,7 @@ void Gui::PrintGameInfo() {
 	DrawText(info, { x, y + 2 * dy });
 	sprintf_s(info, "%d FPS", (int)fps);
 	DrawText(info, { x, y + 3 * dy },false);
-	sprintf_s(info, "a-f g-l");
+	sprintf_s(info, "a-n");
 	DrawText(info, { x, (int)(y + 3.5 * dy) }, false);
 }
 
@@ -482,6 +489,7 @@ void Gui::PrintMap()
 
 // clear memory
 void Gui::Exit() {
+	SaveResults();
 	SDL_FreeSurface(charsetBig); SDL_FreeSurface(charsetSmall);
 	SDL_FreeSurface(screen);
 	for (int i = 0; i < spritesCount; i++)
@@ -491,6 +499,7 @@ void Gui::Exit() {
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	delete[] sprites;
+	delete[] results;
 	delete game;
 }
 
@@ -516,4 +525,117 @@ Gui::~Gui() {
 	Exit();
 }
 
+void Gui::AddResult(Result result)
+{
+	Result* newResults = new Result[resultsCount + 1];
+	for (int i = 0; i < resultsCount; i++)
+		newResults[i] = results[i];
+	newResults[resultsCount] = result;
+	delete[] results;
+	results = newResults;
+	resultsCount++;
+}
+
+void Gui::ShowResults() {
+	SortResults();
+	bool quit = false, sortedByPoints = true; bool changed = true; int selected = 0; char text[128];
+	const int lineHeight = FONT_SIZE_BIG;
+	const int linesPerScreen = (SCREEN_HEIGHT - 5 * lineHeight) / (double)lineHeight;
+	while (!quit) {
+		while (SDL_PollEvent(&event) != 0 && event.type == SDL_KEYDOWN) {
+			switch (event.key.keysym.sym) {
+			case SDLK_p:
+				SortResults(); changed = true; selected = 0; sortedByPoints = true;
+				break;
+			case SDLK_t:
+				SortResults(true); changed = true; selected = 0; sortedByPoints = false;
+				break;
+			case SDLK_UP:
+				if (selected > 0) {
+					selected--;
+					changed = true;
+				}
+				break;
+			case SDLK_DOWN:
+				if (selected < resultsCount - linesPerScreen - 1) {
+					selected++;
+					changed = true;
+				}
+				break;
+			case SDLK_RETURN:
+			case SDLK_ESCAPE:
+				quit = true;
+				break;
+			}
+		}
+		DrawRectangle({ 0, 0 }, SCREEN_WIDTH, SCREEN_HEIGHT, FOREGROUND); //background
+		int printedLine = 0;
+		for (int i = 0; i < resultsCount; i++) {
+			if ((i >= selected) && (i <= selected + linesPerScreen)) {
+				const int y = printedLine * lineHeight;
+				if(sortedByPoints)
+					sprintf_s(text, "%d. %d pkt. (%.1lfs)", i + 1, results[i].points, results[i].time);
+				else
+					sprintf_s(text, "%d. %.1lfs (%d pkt)", i + 1, results[i].time, results[i].points);
+				DrawText(text, { 30, 50 + y });
+				printedLine++;
+			}
+		}
+		if(sortedByPoints)
+			sprintf_s(text, "Wyniki posortowane po liczbie punktow (%d)", resultsCount);
+		else
+			sprintf_s(text, "Wyniki posortowane po czasie (%d)", resultsCount);
+		DrawText(text, { 30, 20 });
+		if (changed) {
+			SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
+			SDL_RenderCopy(renderer, scrtex, NULL, NULL);
+			SDL_RenderPresent(renderer);
+		}
+		changed = false;
+	}
+}
+
+void Gui::SortResults(bool byTime)
+{
+	for (int i = 0; i < resultsCount; i++)
+		for (int j = i + 1; j < resultsCount; j++)
+			if (byTime ? results[i].time < results[j].time : results[i].points < results[j].points) {
+				Result temp = results[i];
+				results[i] = results[j];
+				results[j] = temp;
+			}
+}
+
+void Gui::LoadResults()
+{
+	FILE* file;
+	fopen_s(&file, RESULTS_FILE, "rb");	
+	if (file == NULL) {
+		printf("Unable to open file for reading: %s\n", RESULTS_FILE);
+		return;
+	}
+	delete[] results;
+	fread(&resultsCount, sizeof(resultsCount), 1, file);
+	results = new Result[resultsCount];
+	for (int i = 0; i < resultsCount; i++)
+		fread(&results[i], sizeof(Result), 1, file);
+	fclose(file);
+}
+
+void Gui::SaveResults()
+{
+	FILE* file;
+	fopen_s(&file, RESULTS_FILE, "wb");
+	if (file == NULL) {
+		printf("Unable to open file for writing: %s\n", RESULTS_FILE);
+		return;
+	}
+	fwrite(&resultsCount, sizeof(resultsCount), 1, file);
+	for (int i = 0; i < resultsCount; i++)
+		fwrite(&results[i], sizeof(Result), 1, file);
+	fclose(file);
+}
+
 Point::Point(const int x, const int y) : x(x), y(y) {}
+
+Result::Result(const int points, const double time) : points(points), time(time) {}

@@ -24,6 +24,7 @@
 
 #define SAVES_FOLDER "saves/"
 #define SAVE_EXTENSION ".dat"
+#define RESULTS_FILE "results.dat"
 
 enum Color : Uint32 {
 	BLACK = 0x000000,
@@ -46,19 +47,24 @@ enum Color : Uint32 {
 	FOREGROUND = 0x222222
 };
 
-class Point {
-public:
-	Point(const int x, const int y);
+struct Point {
+	Point(const int x = 0, const int y = 0);
 	int x, y;
+};
+
+struct Result {
+	Result(const int points = 0, const double time = 0);
+	int points; double time;
 };
 
 
 class Gui {
 private:
 	Game* game;
-	int t1, t2, frames = 0, spritesCount = 0, width, height;
+	int t1, t2, frames = 0, spritesCount = 0, width, height, resultsCount = 0;
 	bool menu = false;
 	double fpsTimer = 0, updateTimer = 0, frameTimer = 0, fps, updateTime, frameTime;
+	Result* results;
 	SDL_Event event;
 	SDL_Surface* screen, *charsetBig, *charsetSmall;
 	SDL_Surface* *sprites;
@@ -95,6 +101,13 @@ private:
 	void Input(const SDL_Keycode code);
 	void GameInput();
 	void Exit();
+	
+	void AddResult(Result result);
+	void ShowResults();
+	void SortResults(bool byTime = false);
+	void LoadResults();
+	void SaveResults();
+	
 	void SaveToFile(FILE* file);
 	void LoadFromFile(FILE* file);
 public:
