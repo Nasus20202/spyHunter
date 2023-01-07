@@ -28,13 +28,13 @@
 // max Y distance from screen before sprite is deleted
 #define CLEAN_SPRITES_DISTANCE 500
 #define CAR_SPAWN_DISTANCE 200
-#define SPEED_DIFFERENCE 300
+#define SPEED_DIFFERENCE 700
 #define PENALTY_TIME 5
 #define ENEMY_POINTS 10
 #define START_SPEED 150
 #define MIN_CAR_SPEED 100
 #define MAX_CAR_SPEED 1100
-#define CAR_SPAWN_RATE 100
+#define CAR_SPAWN_RATE 90
 #define POWER_UP_SPAWN_RATE 1000
 #define MULTI_MISSILE_AMOUNT 3
 #define BOMB_AMOUNT 5

@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
-#include <filesystem>
+#include <direct.h>
 #include "gui.h"
 #include "game.h"
 #include "car.h"
@@ -107,17 +107,17 @@ void Gui::Pause() {
 }
 
 void Gui::SaveGame() {
-	const int size = 64;
+	if (_mkdir(SAVES_FOLDER) && errno != EEXIST) {
+			printf("Unable to create folder: %s\n", SAVES_FOLDER);
+			return;
+	}
+	const int size = 256;
 	char name[size], timeStr[size]; FILE* file;
 	time_t rawTime; struct tm* timeInfo = new tm();
 	time(&rawTime);
 	localtime_s(timeInfo, &rawTime);
 	strftime(timeStr, size, "%Y-%m-%d-%H-%M-%S", timeInfo); // create time format
-	sprintf_s(name, size, "%s/%s%s", SAVES_FOLDER, timeStr, SAVE_EXTENSION);
-	if (!std::filesystem::exists(SAVES_FOLDER) && !std::filesystem::create_directory(SAVES_FOLDER)) { // create saves folder
-		printf("Unable to create folder: %s\n", SAVES_FOLDER);
-		return;
-	}
+	sprintf_s(name, size, "%s%s%s", SAVES_FOLDER, timeStr, SAVE_EXTENSION); // create file name
 	fopen_s(&file, name, "wb");
 	if (file == NULL) {
 		printf("Unable to open file for writing: %s\n", name);
@@ -125,26 +125,53 @@ void Gui::SaveGame() {
 	}
 	SaveToFile(file);
 	fclose(file);
+	int savesCount = 0;
+	fopen_s(&file, SAVES_FILE, "rb");
+	if (file != NULL)
+		fread(&savesCount, sizeof(int), 1, file);
+	savesCount++;
+	char** saves = new char* [savesCount];
+	for (int i = 0; i < savesCount; i++) {
+		saves[i] = new char[size];
+		for (int j = 0; j < size; j++)
+			saves[i][j] = '\0';
+	}
+	if (file != NULL) {
+		for (int i = 0; i < savesCount-1; i++)
+			for (int j = 0; j < size; j++)
+				fread(&saves[i][j], sizeof(char), 1, file);
+		fclose(file);
+	}
+	strcpy_s(saves[savesCount-1], size, timeStr);
+	fopen_s(&file, SAVES_FILE, "wb");
+	if (file == NULL) {
+		printf("Unable to open file for writing: %s\n", SAVES_FILE);
+		return;
+	}
+	fwrite(&savesCount, sizeof(int), 1, file);
+	for (int i = 0; i < savesCount; i++)
+		for (int j = 0; j < size; j++)
+			fwrite(&saves[i][j], sizeof(char), 1, file);
+	fclose(file);
 }
 
 void Gui::LoadGame() {
-	if (!std::filesystem::exists(SAVES_FOLDER) && !std::filesystem::create_directory(SAVES_FOLDER)) { // create saves folder
-		printf("Unable to create folder: %s\n", SAVES_FOLDER);
-		return;
-	}
 	FILE* file; const int size = 256; // max file name length
 	char name[size+1], input[size+1] = ""; int fileCount = 0, counter = 0; char** files;
-	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
-		if (entry.is_regular_file() && entry.path().extension() == SAVE_EXTENSION)
-			fileCount++;
-	files = new char*[fileCount];
-	for (int i = 0; i < fileCount; i++)
-		files[i] = new char[size];
-	for (const auto& entry : std::filesystem::directory_iterator(SAVES_FOLDER))
-		if (entry.is_regular_file() && entry.path().extension() == SAVE_EXTENSION) {
-			strcpy_s(files[fileCount-counter-1], size, entry.path().filename().string().c_str());
-			counter++;
-		}
+	fopen_s(&file, SAVES_FILE, "rb");
+	if (file == NULL) {
+		printf("Unable to open file for reading: %s\n", SAVES_FILE);
+		return;
+	}
+	fread(&fileCount, sizeof(fileCount), 1, file);
+	files = new char* [fileCount];
+	for (int i = 0; i < fileCount; i++) {
+		const int id = fileCount - i - 1;
+		files[id] = new char[size];
+		for (int j = 0; j < size; j++)
+			fread(&files[id][j], sizeof(char), 1, file);
+	}
+	fclose(file);
 	
 	// create menu
 	int selected = 0; bool quit = false, accept = false; bool changed = true;
@@ -205,7 +232,7 @@ void Gui::LoadGame() {
 	if (quit) {
 		return;
 	}
-	sprintf_s(name, size, "%s%s", SAVES_FOLDER, input);
+	sprintf_s(name, size, "%s%s%s", SAVES_FOLDER, input, SAVE_EXTENSION);
 	fopen_s(&file, name, "rb");
 	if (file == NULL) {
 		printf("Unable to open file for reading: %s\n", name);

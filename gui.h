@@ -21,6 +21,7 @@
 #define UPDATE_RATE 100
 #define UPDATE_TIME (1/((double)UPDATE_RATE))
 
+#define SAVES_FILE "saves.dat"
 #define SAVES_FOLDER "saves/"
 #define SAVE_EXTENSION ".dat"
 #define RESULTS_FILE "results.dat"
