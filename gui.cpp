@@ -153,6 +153,9 @@ void Gui::SaveGame() {
 		for (int j = 0; j < size; j++)
 			fwrite(&saves[i][j], sizeof(char), 1, file);
 	fclose(file);
+	for (int i = 0; i < savesCount; i++)
+		delete[] saves[i];
+	delete[] saves;
 }
 
 void Gui::LoadGame() {
