@@ -1,6 +1,5 @@
 #pragma once
 #include"./SDL2-2.0.10/include/SDL.h"
-#include"./SDL2-2.0.10/include/SDL_main.h"
 #include "game.h"
 
 #define SCREEN_HEIGHT 720
@@ -90,8 +89,6 @@ private:
 	void Pause();
 	void SaveGame();
 	void LoadGame();
-	
-	void Initialize(const int width, const int height, const char* title);
 	void LoadSprites();
 	void LoadSprite(const char* path);
 	void PrintGameInfo();
@@ -112,5 +109,6 @@ private:
 	void LoadFromFile(FILE* file);
 public:
 	Gui(const int width = SCREEN_WIDTH, const int height = SCREEN_HEIGHT, const double updateTime = UPDATE_TIME, const double frameTime = FRAME_TIME, const char* title = TITLE);
+	void Initialize(const char* title = TITLE);
 	~Gui();
 };

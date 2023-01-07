@@ -216,7 +216,7 @@ void Gui::LoadGame() {
 }
 
 // create and customize GUI
-void Gui::Initialize(const int width, const int height, const char* title) {
+void Gui::Initialize(const char* title) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
 		exit(1);
@@ -518,7 +518,6 @@ Gui::Gui(const int width, const int height, const double updateTime, const doubl
 	this->height = height;
 	this->updateTime = updateTime;
 	this->frameTime = frameTime;
-	Initialize(width, height, title);
 }
 
 Gui::~Gui() {
