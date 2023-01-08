@@ -5,9 +5,11 @@
 
 Game::Game(const int screenWidth, const int screenHeight, const int mapWidth, const int mapHeight)
 {
-	cars = NULL;
+	cars = new Car * [carsAmount];
+	missiles = new Car * [missilesAmount];
 	player = NULL;
 	sprites = NULL;
+	map = new Map(mapWidth, mapHeight);
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 	this->mapWidth = mapWidth;

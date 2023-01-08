@@ -544,6 +544,8 @@ void Gui::LoadFromFile(FILE* file) {
 	
 Gui::Gui(const int width, const int height, const double updateTime, const double frameTime, const char* title) {
 	game = new Game(width, height);
+	this->sprites = new SDL_Surface * [spritesCount];
+	this->results = new Result[resultsCount];
 	this->width = width;
 	this->height = height;
 	this->updateTime = updateTime;

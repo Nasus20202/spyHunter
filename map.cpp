@@ -9,7 +9,7 @@ Map::Map(const int mapWidth, const int mapHeight)
 
 Map::~Map()
 {
-	delete[] map;
+	delete[] this->map;
 }
 
 MapTile* Map::GetMap()
