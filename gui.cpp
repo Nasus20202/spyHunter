@@ -477,7 +477,7 @@ void Gui::PrintGameInfo() {
 	DrawText(info, { x, y + 2 * dy });
 	sprintf_s(info, "%d FPS", (int)fps);
 	DrawText(info, { x, y + 3 * dy },false);
-	sprintf_s(info, "a-n");
+	sprintf_s(info, "a-o");
 	DrawText(info, { x, (int)(y + 3.5 * dy) }, false);
 }
 
